@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>The HTML5 Herald</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans|Roboto|Source+Sans+Pro');
+    </style>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        .box {
+            position: absolute;
+            color: grey;
+        }
+
+        .line {
+            position: absolute;
+            border-left: 1px solid grey;
+            height: 36px;
+        }
+        .bar {
+            border: 1px solid darkgrey;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="box" style="top: 82px; left: 34px;">
+            <span>08:00</span>
+        </div>
+        <div class="box" style="top: 100px; left: 50px;">
+            <div class="line"></div>
+        </div>
+        <div class="box" style="top: 82px; left: 84px;">
+            <span>09:00</span>
+        </div>
+        <div class="box" style="top: 100px; left: 100px;">
+            <div class="line"></div>
+        </div>
+        <div class="box" style="top: 82px; left: 134px;">
+            <span>10:00</span>
+        </div>
+        <div class="box" style="top: 100px; left: 150px;">
+            <div class="line"></div>
+        </div>
+        <div class="box" style="top: 118px; left: 50px;">
+            <div class="bar" style="height: auto; width: 99px; background-color: red; text-align: center">
+                <span style="color: white;">02:00</span>
+            </div>
+        </div>
+        <span style="font-size:30px; padding-left:30px; background:red;">&nbsp;</span>
+    </div>
+</body>
+
+</html>

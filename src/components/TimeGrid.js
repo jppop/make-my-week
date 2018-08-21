@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import Bar from "./Bar";
 
-const GRIDCELL_WIDTH = 48;
+const GRIDCELL_WIDTH = 16 * 4 - 2;
 
 export default class TimeGrid extends Component {
   static propTypes = {
@@ -13,6 +14,18 @@ export default class TimeGrid extends Component {
     start: 8,
     end: 19
   };
+
+  constructor(props) {
+    super(props);
+
+    this.setCellRef = element => {
+      console.log(element);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        console.log(rect);
+      }
+    };
+  }
 
   render() {
     const styles = {
@@ -31,8 +44,7 @@ export default class TimeGrid extends Component {
 
       gridRow: {
         display: "table",
-        borderSpacing: 0,
-        border: "1px solid darkgray"
+        borderSpacing: 0
       },
 
       gridCell: (isFirstChild, isLastChild) => {
@@ -112,18 +124,33 @@ export default class TimeGrid extends Component {
           borderRight: "1px solid darkgray"
         };
         if (isFirstChild) {
-          style.width = 21;
-          style.minWidth = 21;
+          style.width = 20;
+          style.minWidth = 20;
         } else if (isLastChild) {
           style.borderRight = "1px solid transparent";
         }
         return style;
+      },
+      bounds: y => {
+        return {
+          position: "absolute",
+          left: 23,
+          top: y,
+          height: 14,
+          maxHeight: 14,
+          width: (GRIDCELL_WIDTH + 2) * 11,
+          maxWidth: (GRIDCELL_WIDTH + 2) * 11
+        };
       }
     };
 
     const GridCell = props => {
       return (
-        <div style={styles.gridCell(props.isFirstChild, props.isLastChild)}>
+        <div
+          id={props.id}
+          ref={props.cellRef}
+          style={styles.gridCell(props.isFirstChild, props.isLastChild)}
+        >
           {props.children}
         </div>
       );
@@ -136,8 +163,10 @@ export default class TimeGrid extends Component {
         cells.push(
           <GridCell
             key={"grid-cell#" + cell.toString()}
+            id={"grid-cell#" + cell.toString()}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
+            cellRef={props.cellRef}
           >
             &nbsp;
           </GridCell>
@@ -213,7 +242,27 @@ export default class TimeGrid extends Component {
       <div style={styles.container}>
         <Scale start={this.props.start} end={this.props.end} />
         <Tick start={this.props.start} end={this.props.end} />
-        <Grid start={this.props.start} end={this.props.end} />
+        <Grid
+          start={this.props.start}
+          end={this.props.end}
+          cellRef={this.setCellRef}
+        />
+        <div id="bounds" style={styles.bounds(32)}>
+          <Bar
+            x={0}
+            y={0}
+            width={GRIDCELL_WIDTH + 2}
+            color="red"
+            text="01:00"
+          />
+          <Bar
+            x={GRIDCELL_WIDTH + 2}
+            y={0}
+            width={(GRIDCELL_WIDTH + 2) * 2}
+            color="blue"
+            text="02:00"
+          />
+        </div>
       </div>
     );
   }

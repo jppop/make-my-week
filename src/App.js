@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import "semantic-ui-css/semantic.min.css";
 import "./App.css";
-import Bar from "./Bar";
 import TimeGrid from './components/TimeGrid';
 
 class App extends Component {
@@ -9,12 +7,6 @@ class App extends Component {
     return (
       <div className="App">
         <TimeGrid start={8} y={19}/>
-        <div style={{ position: "relative" }}>
-          <Bar x={5} width={200} color="blue" text="04:00" />
-          <Bar x={210} width={200} color="red" text="02:00" />
-          <Bar x={24} y={40 + 36 - 6} width={60} color="blue" text="01:00" />
-          <Bar x={138} y={40 + 36 - 6} width={121} color="red" text="02:00" />
-         </div>
       </div>
     );
   }

@@ -62,8 +62,11 @@ export class Bar extends Component {
                 }}
                 enableResizing={{ top: false, right: true, bottom: false, left: false, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false }}
                 dragAxis='x'
-                dragGrid={[61, 61]}
-                resizeGrid={[61, 61]}
+                dragGrid={[16, 16]}
+                resizeGrid={[16, 16]}
+                maxHeight='auto'
+                maxWidth={64*11}
+                bounds='#bounds'
                 >
                 {this.state.text}
             </Rnd>

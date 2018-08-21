@@ -17,6 +17,7 @@
         body {
             font-family: 'Roboto', sans-serif;
             font-size: 12px;
+            color: grey;
         }
 
         .container {
@@ -51,6 +52,15 @@
 
         .grid-row div:last-child {
             border-right: 1px solid transparent;
+            width: 20px;
+            min-width: 20px;
+            cursor: default;
+        }
+
+        .grid-row div:first-child {
+            width: 20px;
+            min-width: 20px;
+            cursor: default;
         }
 
         .grid-cell {
@@ -62,6 +72,7 @@
             border-left: 1px solid transparent;
             border-right: 1px solid darkgray;
             text-align: center;
+            cursor: crosshair;
         }
 
         .scale {
@@ -72,6 +83,11 @@
 
         .scale-row {
             display: table-row;
+        }
+
+        .scale-row div:first-child {
+            width: 20px;
+            min-width: 20px;
         }
 
         .scale-cell {
@@ -91,6 +107,11 @@
 
         .tick-row {
             display: table-row;
+        }
+
+        .tick-row div:first-child {
+            width: 20px;
+            min-width: 20px;
         }
 
         .tick-row div:last-child {

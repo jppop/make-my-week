@@ -83,17 +83,45 @@ export default class TimeGrid extends Component {
           height: "auto",
           borderLeft: "1px solid transparent",
           borderRight: "1px solid transparent",
-          textAlign: 'left'
+          textAlign: "left"
         };
         if (isFirstChild) {
           style.width = 20;
           style.minWidth = 20;
         }
         return style;
+      },
+
+      tick: {
+        display: "table",
+        borderSpacing: 0,
+        border: "1px solid transparent"
+      },
+
+      tickRow: {
+        display: "table-row"
+      },
+
+      tickCell: (isFirstChild, isLastChild) => {
+        let style = {
+          display: "table-cell",
+          width: GRIDCELL_WIDTH,
+          minWidth: GRIDCELL_WIDTH,
+          height: "auto",
+          borderLeft: "1px solid transparent",
+          borderRight: "1px solid darkgray"
+        };
+        if (isFirstChild) {
+          style.width = 21;
+          style.minWidth = 21;
+        } else if (isLastChild) {
+          style.borderRight = "1px solid transparent";
+        }
+        return style;
       }
     };
 
-   const GridCell = props => {
+    const GridCell = props => {
       return (
         <div style={styles.gridCell(props.isFirstChild, props.isLastChild)}>
           {props.children}
@@ -125,14 +153,14 @@ export default class TimeGrid extends Component {
     const ScaleCell = props => {
       return (
         <div style={styles.scaleCell(props.isFirstChild, props.isLastChild)}>
-          <span style={props.isFirstChild ? {} : {marginLeft: -16}}>
+          <span style={props.isFirstChild ? {} : { marginLeft: -16 }}>
             {props.children}
           </span>
         </div>
       );
     };
 
-     const Scale = props => {
+    const Scale = props => {
       let cells = [];
       for (let hour = props.start - 1; hour <= props.end; hour++) {
         cells.push(
@@ -152,9 +180,39 @@ export default class TimeGrid extends Component {
       );
     };
 
+    const TickCell = props => {
+      return (
+        <div style={styles.tickCell(props.isFirstChild, props.isLastChild)}>
+          &nbsp;
+        </div>
+      );
+    };
+
+    const Tick = props => {
+      let cells = [];
+      const cellCount = 1 + props.end - props.start + 1;
+      for (let cell = 0; cell < cellCount; cell++) {
+        cells.push(
+          <TickCell
+            key={"grid-tick#" + cell.toString()}
+            isFirstChild={cell === 0}
+            isLastChild={cell === cellCount - 1}
+          >
+            &nbsp;
+          </TickCell>
+        );
+      }
+      return (
+        <div style={styles.tick}>
+          <div style={styles.tickRow}>{cells}</div>
+        </div>
+      );
+    };
+
     return (
       <div style={styles.container}>
         <Scale start={this.props.start} end={this.props.end} />
+        <Tick start={this.props.start} end={this.props.end} />
         <Grid start={this.props.start} end={this.props.end} />
       </div>
     );

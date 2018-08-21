@@ -33,8 +33,77 @@
             border-left: 1px solid grey;
             height: 36px;
         }
+
         .bar {
             border: 1px solid darkgrey;
+        }
+
+        .grid {
+            display: table;
+            border-spacing: 0px;
+            /* background-color: darkgray; */
+            border: 1px solid darkgray;
+        }
+
+        .grid-row {
+            display: table-row;
+        }
+
+        .grid-row div:last-child {
+            border-right: 1px solid transparent;
+        }
+
+        .grid-cell {
+            display: table-cell;
+            background-color: white;
+            width: 40px;
+            min-width: 40px;
+            height: auto;
+            border-left: 1px solid transparent;
+            border-right: 1px solid darkgray;
+            text-align: center;
+        }
+
+        .scale {
+            display: table;
+            border-spacing: 0px;
+            border: 1px solid transparent;
+        }
+
+        .scale-row {
+            display: table-row;
+        }
+
+        .scale-cell {
+            display: table-cell;
+            width: 40px;
+            min-width: 40px;
+            height: auto;
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+        }
+
+        .tick {
+            display: table;
+            border-spacing: 0px;
+            border: 1px solid transparent;
+        }
+
+        .tick-row {
+            display: table-row;
+        }
+
+        .tick-row div:last-child {
+            border-right: 1px solid transparent;
+        }
+
+        .tick-cell {
+            display: table-cell;
+            width: 40px;
+            min-width: 40px;
+            height: auto;
+            border-left: 1px solid transparent;
+            border-right: 1px solid darkgray;
         }
     </style>
 
@@ -67,6 +136,71 @@
             </div>
         </div>
         <span style="font-size:30px; padding-left:30px; background:red;">&nbsp;</span>
+        <div class="grid" style="position: absolute; top: 200px;">
+            <div class="grid-row">
+                <div class="grid-cell">&nbsp;</div>
+                <div class="grid-cell">&nbsp;</div>
+                <div class="grid-cell">&nbsp;</div>
+            </div>
+        </div>
+        <div class="grid" style="position: absolute; top: 200px;">
+            <div class="grid-row">
+                <div class="grid-cell">&nbsp;</div>
+                <div class="grid-cell">&nbsp;</div>
+                <div class="grid-cell">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+    <div class="scale">
+        <div class="scale-row">
+            <div class="scale-cell">&nbsp;</div>
+            <div class="scale-cell"><span style="margin-left: -16px">08:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">09:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">10:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">11:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">12:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">13:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">14:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">15:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">16:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">17:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">18:00</span></div>
+            <div class="scale-cell"><span style="margin-left: -16px">19:00</span></div>
+        </div>
+    </div>
+    <div class="tick">
+        <div class="tick-row">
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+            <div class="tick-cell">&nbsp;</div>
+        </div>
+    </div>
+    <div class="grid" style="margin-top: -1px">
+        <div class="grid-row">
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">01:00</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+            <div class="grid-cell">&nbsp;</div>
+        </div>
     </div>
 </body>
 

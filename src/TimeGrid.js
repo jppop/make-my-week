@@ -18,9 +18,41 @@ const styles = {
   },
   bar: {
     position: "absolute",
-    border: "1px solid darkgrey"
+    borderRight: "1px solid darkgrey"
+  },
+  grid: {
+    display: "table",
+    position: "absolute",
+    borderSpacing: 1,
+    backgroundColor: "darkgray",
+    border: "1px solid darkgray"
+  },
+
+  gridRow: {
+    display: "table-row"
+  },
+  gridCell: {
+    display: "table-cell",
+    backgroundColor: "white",
+    width: 60,
+    height: "auto"
   }
 };
+
+function Ticks(props) {
+  let ticks = [];
+  for (let tick = props.start; tick < props.end; tick++) {
+    ticks.push(
+      <Tick
+        key={"tick-" + tick.toString()}
+        tick={tick}
+        x={props.x + ((tick - props.start) * (props.tickLength + 1))}
+        y={props.y}
+      />
+    );
+  }
+  return ticks;
+}
 
 function Tick(props) {
   const tickStyle = {
@@ -35,28 +67,13 @@ function Tick(props) {
   );
 }
 
-function Ticks(props) {
-  let ticks = [];
-  for (let tick = props.start; tick < props.end; tick++) {
-    ticks.push(
-      <Tick
-        key={"tick-" + tick.toString()}
-        tick={tick}
-        x={props.x + (tick - props.start) * props.tickLength}
-        y={props.y}
-      />
-    );
-  }
-  return ticks;
-}
-
 function TickLines(props) {
   let ticks = [];
   for (let tick = props.start; tick < props.end; tick++) {
     ticks.push(
       <TickLine
         key={"tickline-" + tick.toString()}
-        x={15 + props.x + (tick - props.start) * props.tickLength}
+        x={props.x + (tick - props.start) * (props.tickLength + 1)}
         y={props.y}
       />
     );
@@ -73,30 +90,37 @@ function TickLine(props) {
   return <div style={tickLineStyle} />;
 }
 
-function EmptyBars(props) {
+function Grid(props) {
+  const style = {
+    ...styles.grid,
+    left: props.x,
+    top: props.y
+  };
+  return (
+    <div style={style}>
+      <div style={styles.gridRow}>
+        <PlaceHolderBars
+          start={props.start}
+          end={props.end}
+          x={props.x}
+          y={props.y}
+          tickLength={props.tickLength}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PlaceHolderBars(props) {
   let bars = [];
   for (let tick = props.start; tick < props.end + 1; tick++) {
     bars.push(
-      <EmptyBar
-        key={"emptybar-" + tick.toString()}
-        x={15 + props.x + (tick - props.start) * props.tickLength}
-        y={props.y}
-        width={props.tickLength}
-      />
+      <div key={"placeholder-" + tick.toString()} style={styles.gridCell}>
+        &nbsp;
+      </div>
     );
   }
   return bars;
-}
-
-function EmptyBar(props) {
-  const barStyle = {
-    ...styles.bar,
-    left: props.x,
-    top: props.y,
-    height: "auto",
-    width: props.width
-  };
-  return <div style={barStyle}>&nbsp;</div>;
 }
 
 export default class TimeGrid extends Component {
@@ -131,20 +155,18 @@ export default class TimeGrid extends Component {
           <TickLines
             start={this.props.start}
             end={this.props.end}
-            x={this.props.x + this.props.tickLength}
+            x={this.props.x + this.props.tickLength + 14}
             y={this.props.y + 18}
             tickLength={this.props.tickLength}
           />
         </div>
-        <div>
-          <EmptyBars
-            start={this.props.start}
-            end={this.props.end}
-            x={this.props.x}
-            y={this.props.y + 36 - 8}
-            tickLength={this.props.tickLength}
-          />
-        </div>
+        <Grid
+          start={this.props.start}
+          end={this.props.end}
+          x={this.props.x + 12}
+          y={this.props.y + 36 - 8}
+          tickLength={this.props.tickLength}
+        />
       </div>
     );
   }

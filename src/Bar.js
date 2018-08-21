@@ -32,6 +32,7 @@ export class Bar extends Component {
     render() {
         const style = {
             backgroundColor: this.state.color,
+            color: 'white',
         };
         return (
             <Rnd
@@ -47,11 +48,11 @@ export class Bar extends Component {
                         width: this.state.width + d.width,
                     });
                 }}
-                onResize={(e, direction, ref, d, position) => {
-                    this.setState({
-                        text: this.state.width + d.width,
-                    });
-                }}
+                // onResize={(e, direction, ref, d, position) => {
+                //     this.setState({
+                //         text: this.state.width + d.width,
+                //     });
+                // }}
                 onDragStop={(e, data) => {
                     var {x} = data;
                     console.log(data);
@@ -61,10 +62,10 @@ export class Bar extends Component {
                 }}
                 enableResizing={{ top: false, right: true, bottom: false, left: false, topRight: false, bottomRight: false, bottomLeft: false, topLeft: false }}
                 dragAxis='x'
-                dragGrid={[10, 10]}
-                resizeGrid={[5, 5]}
+                dragGrid={[61, 61]}
+                resizeGrid={[61, 61]}
                 >
-                {this.state.text}({this.state.width}x{this.state.height}, at {this.state.x})
+                {this.state.text}
             </Rnd>
         )
     }

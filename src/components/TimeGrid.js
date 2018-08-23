@@ -6,33 +6,27 @@ const QUATER_WIDTH = 16;
 
 export default class TimeGrid extends Component {
   static propTypes = {
-    start: PropTypes.number,
-    end: PropTypes.number,
+    data: PropTypes.object.isRequired,
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
-    quarterWidth: PropTypes.number,
+    quarterWidth: PropTypes.number
   };
 
   static defaultProps = {
-    start: 8,
-    end: 19,
     cellHeight: 14,
-    cellWidth: (QUATER_WIDTH * 4) - 2,
+    cellWidth: QUATER_WIDTH * 4 - 2,
     quarterWidth: QUATER_WIDTH,
-    leftMargin : 20
+    leftMargin: 20
   };
 
   constructor(props) {
     super(props);
 
-    this.setCellRef = element => {
-      console.log(element);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        console.log(rect);
-      }
+    this.state = {
+      data: this.props.data
     };
+
     const styles = {
       container: {
         position: "relative",
@@ -143,8 +137,13 @@ export default class TimeGrid extends Component {
           top: (this.props.cellHeight + 2) * (index + 2),
           height: this.props.cellHeight,
           maxHeight: this.props.cellHeight,
-          width: (this.props.cellWidth + 2) * (this.props.end - this.props.start),
-          maxWidth: (this.props.cellWidth + 2) * (this.props.end - this.props.start)
+          width:
+            (this.props.cellWidth + 2) *
+            (this.props.data.end - this.props.data.start),
+          maxWidth:
+            (this.props.cellWidth + 2) *
+            (this.props.data.end - this.props.data.start),
+          cursor: "crosshair"
         };
       }
     };
@@ -153,7 +152,6 @@ export default class TimeGrid extends Component {
     this.styles.bounds.bind(this);
     this.styles.tickCell.bind(this);
     this.styles.scaleCell.bind(this);
-
   }
 
   render() {
@@ -161,7 +159,6 @@ export default class TimeGrid extends Component {
       return (
         <div
           id={props.id}
-          ref={props.cellRef}
           style={this.styles.gridCell(props.isFirstChild, props.isLastChild)}
         >
           {props.children}
@@ -179,7 +176,6 @@ export default class TimeGrid extends Component {
             id={"grid-cell#" + cell.toString()}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
-            cellRef={props.cellRef}
           >
             &nbsp;
           </GridCell>
@@ -194,8 +190,10 @@ export default class TimeGrid extends Component {
 
     const ScaleCell = props => {
       return (
-        <div style={this.styles.scaleCell(props.isFirstChild, props.isLastChild)}>
-          <span style={props.isFirstChild ? {} : {marginLeft: -16}}>
+        <div
+          style={this.styles.scaleCell(props.isFirstChild, props.isLastChild)}
+        >
+          <span style={props.isFirstChild ? {} : { marginLeft: -16 }}>
             {props.children}
           </span>
         </div>
@@ -224,7 +222,9 @@ export default class TimeGrid extends Component {
 
     const TickCell = props => {
       return (
-        <div style={this.styles.tickCell(props.isFirstChild, props.isLastChild)}>
+        <div
+          style={this.styles.tickCell(props.isFirstChild, props.isLastChild)}
+        >
           &nbsp;
         </div>
       );
@@ -251,37 +251,49 @@ export default class TimeGrid extends Component {
       );
     };
 
+    const Works = props => {
+      console.log(props)
+      return props.works.map((work,index) => {
+        return (
+          <Bar
+            key={"work#" + index}
+            boundsSelector={props.boundsSelector}
+            dragSizeIncrement={props.quarterWidth}
+            maxWidth={props.maxWidth}
+            x={(props.cellWidth + 2) * (work.start - props.start)}
+            width={((props.cellWidth + 2) * work.duration()) - 1}
+            color={work.color}
+            text={work.durationAsString()}
+          />
+        );
+      });
+    };
+
+    let works = this.state.data.timelines.map((timeline, index) => {
+      const key = `work#${timeline.worker}`;
+      const boundsId = `work-${timeline.worker}`;
+      const maxWidth = this.styles.bounds(0).maxWidth;
+      return (
+        <div key={key}>
+          <Grid start={this.props.data.start} end={this.props.data.end} />
+          <div id={boundsId} style={this.styles.bounds(index)}>
+            <Works
+              works={timeline.works}
+              start={this.props.data.start}
+              boundsSelector={"#" + boundsId}
+              quarterWidth = {this.props.quarterWidth}
+              maxWidth={maxWidth}
+              cellWidth = {this.props.cellWidth}
+            />
+          </div>
+        </div>
+      );
+    });
     return (
       <div style={this.styles.container}>
-        <Scale start={this.props.start} end={this.props.end} />
-        <Tick start={this.props.start} end={this.props.end} />
-        <Grid
-          start={this.props.start}
-          end={this.props.end}
-          cellRef={this.setCellRef}
-        />
-        <div id="bounds" style={this.styles.bounds(0)}>
-          <Bar
-            boundsSelector="#bounds"
-            dragSizeIncrement={this.props.quarterWidth}
-            maxWidth={this.styles.bounds(0).maxWidth}
-            x={0}
-            y={0}
-            width={this.props.cellWidth + 2}
-            color="red"
-            text="01:00"
-          />
-          <Bar
-            boundsSelector="#bounds"
-            dragSizeIncrement={this.props.quarterWidth}
-            maxWidth={this.styles.bounds(0).maxWidth}
-            x={this.props.cellWidth + 2}
-            y={0}
-            width={(this.props.cellWidth + 2) * 2}
-            color="blue"
-            text="02:00"
-          />
-        </div>
+        <Scale start={this.props.data.start} end={this.props.data.end} />
+        <Tick start={this.props.data.start} end={this.props.data.end} />
+        {works}
       </div>
     );
   }

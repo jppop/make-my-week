@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Rnd } from "react-rnd";
+import Color from "color";
 
 // see https://github.com/bokuweb/react-rnd
 export class Bar extends Component {
   constructor(props) {
     super(props);
-    this.state = props;
+    this.state = {
+      text: props.text,
+      width: props.width,
+      x: props.x
+    }
   }
 
   static propTypes = {
@@ -34,23 +39,24 @@ export class Bar extends Component {
   };
 
   render() {
+    let color = Color(this.props.color);
     const style = {
-      backgroundColor: this.state.color,
-      color: "white"
+      backgroundColor: this.props.color,
+      color: color.isDark() ? "white" : "black"
     };
     return (
       <Rnd
         style={style}
         default={{
           x: this.state.x,
-          y: this.state.y,
+          y: this.props.y,
           width: this.state.width,
-          height: this.state.height
+          height: this.props.height
         }}
         onResizeStop={(e, direction, ref, d, position) => {
-          this.setState({
-            width: this.state.width + d.width
-          });
+           this.setState({
+             width: this.state.width + d.width
+           });
         }}
         // onResize={(e, direction, ref, d, position) => {
         //     this.setState({
@@ -58,11 +64,10 @@ export class Bar extends Component {
         //     });
         // }}
         onDragStop={(e, data) => {
-          var { x } = data;
-          console.log(data);
-          this.setState({
-            x: x
-          });
+          console.log(data)
+           this.setState({
+             x: data.lastX
+           });
         }}
         enableResizing={{
           top: false,

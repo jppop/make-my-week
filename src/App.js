@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "./App.css";
 import TimeGrid from "./components/TimeGrid";
+import WorkWeekGrid from "./components/WorkWeekGrid";
 
 class Project {
   constructor(id, label) {
@@ -63,19 +64,51 @@ let data = {
     },
     {
       worker: "other",
-      works: [
-        new Work(projects[0].tasks[0], 8, 19),
-      ]
+      works: [new Work(projects[0].tasks[0], 8, 19)]
     }
   ]
 };
 console.log(data);
+
+let weekWork = {
+  start: 8,
+  end: 19,
+  lunchTime: { start: 12, end: 14 },
+  day: new Date(2018, 8, 20),
+  timelines: [
+    {
+      day: new Date(2018, 8, 20),
+      works: [
+        new Work(projects[0].tasks[0], 8, 9),
+        new Work(projects[0].tasks[1], 9, 11.25),
+        new Work(projects[1].tasks[0], 14, 18)
+      ]
+    },
+    {
+      day: new Date(2018, 8, 21),
+      works: [new Work(projects[0].tasks[0], 8, 18)]
+    },
+    {
+      day: new Date(2018, 8, 22),
+      works: [new Work(projects[0].tasks[0], 8, 18)]
+    },
+    {
+      day: new Date(2018, 8, 23),
+      works: []
+    },
+    {
+      day: new Date(2018, 8, 24),
+      works: []
+    }
+  ]
+};
 
 class App extends Component {
   render() {
     return (
       <div className="App">
         <TimeGrid data={data} />
+        <WorkWeekGrid data={weekWork} />
       </div>
     );
   }

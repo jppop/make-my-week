@@ -79,7 +79,7 @@ export class Bar extends Component {
           bottomLeft: false,
           topLeft: false
         }}
-        dragAxis="x"
+        dragAxis="both"
         dragGrid={[this.props.dragSizeIncrement, this.props.dragSizeIncrement]}
         resizeGrid={[this.props.dragSizeIncrement, this.props.dragSizeIncrement]}
         maxHeight="auto"

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Bar from "./Bar";
+import moment from "moment";
 
 const QUATER_WIDTH = 16;
 
@@ -10,6 +11,7 @@ export default class WorkWeekGrid extends Component {
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
+    rightMargin: PropTypes.number,
     quarterWidth: PropTypes.number
   };
 
@@ -17,7 +19,8 @@ export default class WorkWeekGrid extends Component {
     cellHeight: 14,
     cellWidth: QUATER_WIDTH * 4 - 2,
     quarterWidth: QUATER_WIDTH,
-    leftMargin: 20
+    leftMargin: 40,
+    rightMargin: 20
   };
 
   constructor(props) {
@@ -51,7 +54,7 @@ export default class WorkWeekGrid extends Component {
         borderSpacing: 0
       },
 
-      gridCell: (isFirstChild, isLastChild) => {
+      gridCell: (isFirstChild, isLastChild, lunchTime) => {
         let style = {
           display: "table-cell",
           width: this.props.cellWidth,
@@ -69,15 +72,19 @@ export default class WorkWeekGrid extends Component {
             width: this.props.leftMargin,
             minWidth: this.props.leftMargin,
             cursor: "default",
-            color: "darkgray"
+            color: "darkgray",
+            textAlign: "right"
           };
         } else if (isLastChild) {
-          firstChildStyle = {
-            width: this.props.leftMargin,
-            minWidth: this.props.leftMargin,
+          lastChildStyle = {
+            width: this.props.rightMargin,
+            minWidth: this.props.rightMargin,
             cursor: "default",
             borderRight: "1px solid transparent"
           };
+        }
+        if (lunchTime) {
+          style.backgroundColor = "#e6e6e6";
         }
         return { ...style, ...firstChildStyle, ...lastChildStyle };
       },
@@ -141,10 +148,10 @@ export default class WorkWeekGrid extends Component {
           position: "absolute",
           left: this.props.leftMargin + 3,
           top: (this.props.cellHeight + 2) * 2,
-          height: ((this.props.cellHeight + 2) * lines) - 2,
-          maxHeight: ((this.props.cellHeight + 2) * lines) - 2,
-          width: ((this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime)) - 1,
-          maxWidth: ((this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime)) - 1,
+          height: (this.props.cellHeight + 2) * lines - 2,
+          maxHeight: (this.props.cellHeight + 2) * lines - 2,
+          width: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
+          maxWidth: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
           cursor: "crosshair"
         };
       }
@@ -159,7 +166,7 @@ export default class WorkWeekGrid extends Component {
   render() {
     const GridCell = props => {
       return (
-        <div id={props.id} style={this.styles.gridCell(props.isFirstChild, props.isLastChild)}>
+        <div id={props.id} style={this.styles.gridCell(props.isFirstChild, props.isLastChild, props.lunchTime)}>
           {props.children}
         </div>
       );
@@ -168,6 +175,9 @@ export default class WorkWeekGrid extends Component {
     const DayGrid = props => {
       let cells = [];
       const cellCount = 1 + props.end - props.start + 1;
+      const cellLunchTimeStart = props.lunchTimeStart - props.start + 1;
+      const cellLunchTimeEnd = props.end - props.lunchTimeEnd + 1;
+      const day = moment(props.day).format("dd DD");
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
           <GridCell
@@ -175,8 +185,13 @@ export default class WorkWeekGrid extends Component {
             id={"grid-cell#" + cell.toString()}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
+            lunchTime={cellLunchTimeStart <= cell && cell <= cellLunchTimeEnd}
           >
-            {cell === 0 ? <span>{props.day.getDate()}</span> : <span>&nbsp;</span>}
+            {cell === 0 ? (
+              <span style={{ paddingRight: 2 }}>{day}</span>
+            ) : (
+              <span>&nbsp;</span>
+            )}
           </GridCell>
         );
       }
@@ -191,6 +206,7 @@ export default class WorkWeekGrid extends Component {
       return props.workweek.timelines.map((timeline, dayIndex) => {
         let day = new Date(props.workweek.day);
         day.setDate(props.workweek.day.getDate() + dayIndex);
+        let lunchTime = props.workweek.hasLunchTime && props.workweek.lunchTime;
         return (
           <DayGrid
             key={"day-grid#" + dayIndex}
@@ -198,6 +214,9 @@ export default class WorkWeekGrid extends Component {
             start={props.workweek.startTime}
             end={props.workweek.endTime}
             isFirstChild={dayIndex === 0}
+            lunchTime={lunchTime}
+            lunchTimeStart={lunchTime ? props.workweek.lunchTime.start : Number.MAX_VALUE}
+            lunchTimeEnd={lunchTime ? props.workweek.lunchTime.end : -1}
           />
         );
       });

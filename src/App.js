@@ -58,6 +58,7 @@ class Work {
     }
     return duration;
   }
+
   durationAsString() {
     const duration = this.duration(true);
     let hour = Math.trunc(duration);
@@ -89,12 +90,12 @@ let data = {
 class WorkWeek {
   constructor(day) {
     this.day = day || new Date();
+    this.hasLunchTime = true;
     this.lunchTime = { start: 12, end: 14 };
     this.startTime = 8;
     this.endTime = 19;
     this.daysPerWeek = 5;
     this.timelines = Array(this.daysPerWeek).fill(null).map( () => { return {works: []}; } );
-
   }
 
   addWork(day, work) {
@@ -105,6 +106,7 @@ class WorkWeek {
       dayIndex = day;
     }
     if (dayIndex >= 0 && dayIndex < this.daysPerWeek) {
+      work.hasLunchTime = this.hasLunchTime;
       work.lunchTime = this.lunchTime;
       work.workTime = [this.startTime, this.endTime];
       this.timelines[dayIndex].works.push(work);

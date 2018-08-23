@@ -143,8 +143,8 @@ export default class WorkWeekGrid extends Component {
           top: (this.props.cellHeight + 2) * 2,
           height: ((this.props.cellHeight + 2) * lines) - 2,
           maxHeight: ((this.props.cellHeight + 2) * lines) - 2,
-          width: ((this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start)) - 1,
-          maxWidth: ((this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start)) - 1,
+          width: ((this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime)) - 1,
+          maxWidth: ((this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime)) - 1,
           cursor: "crosshair"
         };
       }
@@ -195,8 +195,8 @@ export default class WorkWeekGrid extends Component {
           <DayGrid
             key={"day-grid#" + dayIndex}
             day={timeline.day || day}
-            start={props.workweek.start}
-            end={props.workweek.end}
+            start={props.workweek.startTime}
+            end={props.workweek.endTime}
             isFirstChild={dayIndex === 0}
           />
         );
@@ -263,7 +263,7 @@ export default class WorkWeekGrid extends Component {
               boundsSelector={props.boundsSelector}
               dragSizeIncrement={props.quarterWidth}
               maxWidth={props.maxWidth}
-              x={(props.cellWidth + 2) * (work.start - props.workweek.start)}
+              x={(props.cellWidth + 2) * (work.start - props.workweek.startTime)}
               y={(props.cellHeight + 2) * dayIndex}
               width={(props.cellWidth + 2) * work.duration() - 1}
               color={work.color}
@@ -277,8 +277,8 @@ export default class WorkWeekGrid extends Component {
     const boundStyle = this.styles.bounds(this.state.data.timelines.length);
     return (
       <div style={this.styles.container}>
-        <Scale start={this.props.data.start} end={this.props.data.end} />
-        <Tick start={this.props.data.start} end={this.props.data.end} />
+        <Scale start={this.props.data.startTime} end={this.props.data.endTime} />
+        <Tick start={this.props.data.startTime} end={this.props.data.endTime} />
         <Grid workweek={this.props.data} />
         <div id="bounds" style={boundStyle}>
           <Works

@@ -29,20 +29,37 @@ projects[0].addTask(new Task("T02", "Task #02", "olive"));
 projects[1].addTask(new Task("T01", "Task #01", "aliceblue"));
 projects[1].addTask(new Task("T02", "Task #02", "crimson"));
 
-console.log(projects);
-
 class Work {
   constructor(task, start, end) {
     this.id = { project: task.projectId, task: task.id };
     this.start = start;
     this.end = end;
     this.color = task.color;
+    this.hasLunchTime = true;
   }
-  duration() {
-    return this.end - this.start;
+  duration(adjusted) {
+    let duration;
+    if (adjusted && this.hasLunchTime && this.lunchTime) {
+      const a = this.lunchTime.start;
+      const b = this.lunchTime.end;
+      if (b <= this.start || this.end <= a) {
+        duration = this.end - this.start;
+      } else if (a <= this.start && this.end <= b) {
+        duration = 0;
+      } else if (a <= this.start && b <= this.end) {
+        duration = this.end - b;
+      } else if (this.start <= a && this.end <= b) {
+        duration = a - this.start;
+      } else {
+        duration = (a - this.start) + (this.end - b);
+      }
+    } else {
+      duration = this.end - this.start;
+    }
+    return duration;
   }
   durationAsString() {
-    const duration = this.duration();
+    const duration = this.duration(true);
     let hour = Math.trunc(duration);
     let minutes = (duration - hour) * 60;
     return hour.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
@@ -68,47 +85,49 @@ let data = {
     }
   ]
 };
-console.log(data);
 
-let weekWork = {
-  start: 8,
-  end: 19,
-  lunchTime: { start: 12, end: 14 },
-  day: new Date(2018, 8, 20),
-  timelines: [
-    {
-      day: new Date(2018, 8, 20),
-      works: [
-        new Work(projects[0].tasks[0], 8, 9),
-        new Work(projects[0].tasks[1], 9, 11.25),
-        new Work(projects[1].tasks[0], 14, 18)
-      ]
-    },
-    {
-      day: new Date(2018, 8, 21),
-      works: [new Work(projects[0].tasks[0], 8, 18)]
-    },
-    {
-      day: new Date(2018, 8, 22),
-      works: [new Work(projects[0].tasks[0], 8, 18)]
-    },
-    {
-      day: new Date(2018, 8, 23),
-      works: []
-    },
-    {
-      day: new Date(2018, 8, 24),
-      works: []
+class WorkWeek {
+  constructor(day) {
+    this.day = day || new Date();
+    this.lunchTime = { start: 12, end: 14 };
+    this.startTime = 8;
+    this.endTime = 19;
+    this.daysPerWeek = 5;
+    this.timelines = Array(this.daysPerWeek).fill(null).map( () => { return {works: []}; } );
+
+  }
+
+  addWork(day, work) {
+    let dayIndex;
+    if (day instanceof Date) {
+      dayIndex = day.getDay() - 1;
+    } else {
+      dayIndex = day;
     }
-  ]
-};
+    if (dayIndex >= 0 && dayIndex < this.daysPerWeek) {
+      work.lunchTime = this.lunchTime;
+      work.workTime = [this.startTime, this.endTime];
+      this.timelines[dayIndex].works.push(work);
+    }
+  }
+}
+const workWeek = new WorkWeek(new Date(2018, 7, 20));
+workWeek.addWork(0, new Work(projects[0].tasks[0], 8, 9));
+workWeek.addWork(0, new Work(projects[0].tasks[1], 9, 11.25));
+workWeek.addWork(0, new Work(projects[1].tasks[0], 14, 18));
+workWeek.addWork(new Date(2018, 7, 21), new Work(projects[0].tasks[0], 8, 18));
+workWeek.addWork(4, new Work(projects[0].tasks[0], 8, 9));
+workWeek.addWork(4, new Work(projects[0].tasks[1], 9, 11.25));
+workWeek.addWork(4, new Work(projects[1].tasks[0], 14, 18));
+
+console.log(workWeek);
 
 class App extends Component {
   render() {
     return (
       <div className="App">
         <TimeGrid data={data} />
-        <WorkWeekGrid data={weekWork} />
+        <WorkWeekGrid data={workWeek} />
       </div>
     );
   }

@@ -60,6 +60,12 @@ let data = {
         new Work(projects[0].tasks[1], 9, 11.25),
         new Work(projects[1].tasks[0], 14, 18)
       ]
+    },
+    {
+      worker: "other",
+      works: [
+        new Work(projects[0].tasks[0], 8, 19),
+      ]
     }
   ]
 };

@@ -34,11 +34,16 @@ export default class TimeGrid extends Component {
         fontSize: 12
       },
 
-      grid: {
-        display: "table",
-        borderSpacing: 0,
-        border: "1px solid darkgray",
-        marginTop: -1
+      grid: isFirstChild => {
+        let style = {
+          display: "table",
+          borderSpacing: 0,
+          border: "1px solid darkgray",
+        };
+        if (isFirstChild) {
+          style.marginTop = -1;
+        }
+        return style;
       },
 
       gridRow: {
@@ -137,12 +142,8 @@ export default class TimeGrid extends Component {
           top: (this.props.cellHeight + 2) * (index + 2),
           height: this.props.cellHeight,
           maxHeight: this.props.cellHeight,
-          width:
-            (this.props.cellWidth + 2) *
-            (this.props.data.end - this.props.data.start),
-          maxWidth:
-            (this.props.cellWidth + 2) *
-            (this.props.data.end - this.props.data.start),
+          width: (this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start),
+          maxWidth: (this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start),
           cursor: "crosshair"
         };
       }
@@ -157,10 +158,7 @@ export default class TimeGrid extends Component {
   render() {
     const GridCell = props => {
       return (
-        <div
-          id={props.id}
-          style={this.styles.gridCell(props.isFirstChild, props.isLastChild)}
-        >
+        <div id={props.id} style={this.styles.gridCell(props.isFirstChild, props.isLastChild)}>
           {props.children}
         </div>
       );
@@ -182,7 +180,7 @@ export default class TimeGrid extends Component {
         );
       }
       return (
-        <div style={this.styles.grid}>
+        <div style={this.styles.grid(props.isFirstChild)}>
           <div style={this.styles.gridRow}>{cells}</div>
         </div>
       );
@@ -190,12 +188,8 @@ export default class TimeGrid extends Component {
 
     const ScaleCell = props => {
       return (
-        <div
-          style={this.styles.scaleCell(props.isFirstChild, props.isLastChild)}
-        >
-          <span style={props.isFirstChild ? {} : { marginLeft: -16 }}>
-            {props.children}
-          </span>
+        <div style={this.styles.scaleCell(props.isFirstChild, props.isLastChild)}>
+          <span style={props.isFirstChild ? {} : { marginLeft: -16 }}>{props.children}</span>
         </div>
       );
     };
@@ -221,13 +215,7 @@ export default class TimeGrid extends Component {
     };
 
     const TickCell = props => {
-      return (
-        <div
-          style={this.styles.tickCell(props.isFirstChild, props.isLastChild)}
-        >
-          &nbsp;
-        </div>
-      );
+      return <div style={this.styles.tickCell(props.isFirstChild, props.isLastChild)}>&nbsp;</div>;
     };
 
     const Tick = props => {
@@ -235,11 +223,7 @@ export default class TimeGrid extends Component {
       const cellCount = 1 + props.end - props.start + 1;
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
-          <TickCell
-            key={"grid-tick#" + cell.toString()}
-            isFirstChild={cell === 0}
-            isLastChild={cell === cellCount - 1}
-          >
+          <TickCell key={"grid-tick#" + cell.toString()} isFirstChild={cell === 0} isLastChild={cell === cellCount - 1}>
             &nbsp;
           </TickCell>
         );
@@ -252,8 +236,8 @@ export default class TimeGrid extends Component {
     };
 
     const Works = props => {
-      console.log(props)
-      return props.works.map((work,index) => {
+      console.log(props);
+      return props.works.map((work, index) => {
         return (
           <Bar
             key={"work#" + index}
@@ -261,7 +245,7 @@ export default class TimeGrid extends Component {
             dragSizeIncrement={props.quarterWidth}
             maxWidth={props.maxWidth}
             x={(props.cellWidth + 2) * (work.start - props.start)}
-            width={((props.cellWidth + 2) * work.duration()) - 1}
+            width={(props.cellWidth + 2) * work.duration() - 1}
             color={work.color}
             text={work.durationAsString()}
           />
@@ -275,15 +259,15 @@ export default class TimeGrid extends Component {
       const maxWidth = this.styles.bounds(0).maxWidth;
       return (
         <div key={key}>
-          <Grid start={this.props.data.start} end={this.props.data.end} />
+          <Grid start={this.props.data.start} end={this.props.data.end} isFirstChild={index === 0} />
           <div id={boundsId} style={this.styles.bounds(index)}>
             <Works
               works={timeline.works}
               start={this.props.data.start}
               boundsSelector={"#" + boundsId}
-              quarterWidth = {this.props.quarterWidth}
+              quarterWidth={this.props.quarterWidth}
               maxWidth={maxWidth}
-              cellWidth = {this.props.cellWidth}
+              cellWidth={this.props.cellWidth}
             />
           </div>
         </div>

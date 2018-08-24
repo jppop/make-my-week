@@ -89,6 +89,7 @@ class WorkWeek {
       work.hasLunchTime = this.hasLunchTime;
       work.lunchTime = this.lunchTime;
       work.workTime = [this.startTime, this.endTime];
+      work.dayIndex = dayIndex;
       this.timelines[dayIndex].works.push(work);
     }
   }

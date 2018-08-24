@@ -62,7 +62,7 @@ export class Bar extends Component {
         onResize={(e, direction, ref, d, position) => {
           let width = ref.offsetWidth;
           let duration = width / this.props.unit[0];
-          let workItem = Object.assign( Object.create( Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
+          let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
           workItem.end = workItem.start + duration;
           this.setState({
             workItem: workItem
@@ -70,8 +70,15 @@ export class Bar extends Component {
         }}
         onDragStop={(e, data) => {
           console.log(data);
+          let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
+          const duration = workItem.duration();
+          workItem.start = workItem.workTime[0] + (data.lastX / this.props.unit[0]);
+          workItem.end = workItem.start + duration;
+          workItem.dayIndex = data.lastY / this.props.unit[1];
           this.setState({
-            x: data.lastX
+            x: data.lastX,
+            y: data.lastY,
+            workItem: workItem
           });
         }}
         enableResizing={{

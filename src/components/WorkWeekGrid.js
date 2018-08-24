@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Bar from "./Bar";
 import moment from "moment";
+import { WorkWeek, Work, Task, Project } from "../domain/WorkWeek";
 
 const QUATER_WIDTH = 16;
 
 export default class WorkWeekGrid extends Component {
   static propTypes = {
     data: PropTypes.object.isRequired,
+    projects: PropTypes.array.isRequired,
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
@@ -26,22 +28,26 @@ export default class WorkWeekGrid extends Component {
   constructor(props) {
     super(props);
 
+    const workWeek = [];
+    props.data.timelines.forEach(timeline => {
+      return timeline.works.map(work => workWeek.push(work));
+    });
     this.state = {
-      data: this.props.data
+      workWeek: workWeek
     };
 
     const styles = {
       container: {
         position: "relative",
         fontFamily: "'Roboto', sans-serif",
-        fontSize: 12
+        fontSize: 12,
       },
 
       grid: isFirstChild => {
         let style = {
           display: "table",
           borderSpacing: 0,
-          border: "1px solid darkgray"
+          border: "1px solid darkgray",
         };
         if (isFirstChild) {
           style.marginTop = -1;
@@ -63,7 +69,8 @@ export default class WorkWeekGrid extends Component {
           borderLeft: "1px solid transparent",
           borderRight: "1px solid darkgray",
           textAlign: "center",
-          cursor: "crosshair"
+          cursor: "crosshair",
+          pointerEvents: "auto"
         };
         let firstChildStyle = {};
         let lastChildStyle = {};
@@ -92,7 +99,7 @@ export default class WorkWeekGrid extends Component {
       scale: {
         display: "table",
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: "1px solid transparent",
       },
 
       scaleRow: {
@@ -119,7 +126,7 @@ export default class WorkWeekGrid extends Component {
       tick: {
         display: "table",
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: "1px solid transparent",
       },
 
       tickRow: {
@@ -133,7 +140,7 @@ export default class WorkWeekGrid extends Component {
           minWidth: this.props.cellWidth,
           height: "auto",
           borderLeft: "1px solid transparent",
-          borderRight: "1px solid darkgray"
+          borderRight: "1px solid darkgray",
         };
         if (isFirstChild) {
           style.width = this.props.leftMargin;
@@ -152,7 +159,6 @@ export default class WorkWeekGrid extends Component {
           maxHeight: (this.props.cellHeight + 2) * lines - 2,
           width: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
           maxWidth: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
-          cursor: "crosshair"
         };
       }
     };
@@ -161,6 +167,9 @@ export default class WorkWeekGrid extends Component {
     this.styles.bounds.bind(this);
     this.styles.tickCell.bind(this);
     this.styles.scaleCell.bind(this);
+
+    // this.onWorkItemUpdate.bind(this);
+    // this.onGridClick.bind(this);
   }
 
   render() {
@@ -178,6 +187,9 @@ export default class WorkWeekGrid extends Component {
       const cellLunchTimeStart = props.lunchTimeStart - props.start + 1;
       const cellLunchTimeEnd = props.end - props.lunchTimeEnd + 1;
       const day = moment(props.day).format("dd DD");
+      let handleClick = () => {
+        console.log("this is:", this);
+      };
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
           <GridCell
@@ -188,9 +200,11 @@ export default class WorkWeekGrid extends Component {
             lunchTime={cellLunchTimeStart <= cell && cell <= cellLunchTimeEnd}
           >
             {cell === 0 ? (
-              <span style={{ paddingRight: 2 }}>{day}</span>
+              <span onClick={handleClick} style={{ paddingRight: 2 }}>
+                {day}
+              </span>
             ) : (
-              <span>&nbsp;</span>
+              <span onClick={handleClick}>&nbsp;</span>
             )}
           </GridCell>
         );
@@ -217,6 +231,7 @@ export default class WorkWeekGrid extends Component {
             lunchTime={lunchTime}
             lunchTimeStart={lunchTime ? props.workweek.lunchTime.start : Number.MAX_VALUE}
             lunchTimeEnd={lunchTime ? props.workweek.lunchTime.end : -1}
+            onClickHandler={props.onClickHandler}
           />
         );
       });
@@ -272,44 +287,61 @@ export default class WorkWeekGrid extends Component {
     };
 
     const Works = props => {
-      return props.workweek.timelines.map((timeline, dayIndex) => {
-        let day = new Date(props.workweek.day);
-        day.setDate(props.workweek.day.getDate() + dayIndex);
-        return timeline.works.map((work, workIndex) => {
-          return (
-            <Bar
-              workItem={work}
-              unit={[props.cellWidth + 2, props.cellHeight + 2]}
-              key={"work#" + day.getDate() + "-" + workIndex}
-              boundsSelector={props.boundsSelector}
-              dragSizeIncrement={props.quarterWidth}
-              maxWidth={props.maxWidth}
-              x={(props.cellWidth + 2) * (work.start - props.workweek.startTime)}
-              y={(props.cellHeight + 2) * dayIndex}
-              width={(props.cellWidth + 2) * work.duration() - 1}
-              color={work.color}
-            />
-          );
-        });
+      return props.workweek.map(work => {
+        return (
+          <Bar
+            workItem={work}
+            unit={[props.cellWidth + 2, props.cellHeight + 2]}
+            key={"work#" + work.id.work}
+            boundsSelector={props.boundsSelector}
+            dragSizeIncrement={props.quarterWidth}
+            maxWidth={props.maxWidth}
+            x={(props.cellWidth + 2) * (work.start - props.startTime)}
+            y={(props.cellHeight + 2) * work.dayIndex}
+            width={(props.cellWidth + 2) * work.duration() - 1}
+            color={work.color}
+            onWorkItemUpdate={this.onWorkItemUpdate}
+          />
+        );
       });
     };
 
-    const boundStyle = this.styles.bounds(this.state.data.timelines.length);
+    const boundStyle = this.styles.bounds(this.props.data.timelines.length);
+
     return (
       <div style={this.styles.container}>
         <Scale start={this.props.data.startTime} end={this.props.data.endTime} />
         <Tick start={this.props.data.startTime} end={this.props.data.endTime} />
-        <Grid workweek={this.props.data} />
+        <Grid workweek={this.props.data} onClickHandler={this.onGridClick} />
         <div id="bounds" style={boundStyle}>
-          <Works
-            workweek={this.props.data}
-            boundsSelector="#bounds"
-            quarterWidth={this.props.quarterWidth}
-            cellWidth={this.props.cellWidth}
-            cellHeight={this.props.cellHeight}
-          />
+          <div>
+            <Works
+              workweek={this.state.workWeek}
+              boundsSelector="#bounds"
+              quarterWidth={this.props.quarterWidth}
+              cellWidth={this.props.cellWidth}
+              cellHeight={this.props.cellHeight}
+              startTime={this.props.data.startTime}
+            />
+          </div>
         </div>
       </div>
     );
   }
+
+  onWorkItemUpdate = workItem => {
+    //    console.log(workItem);
+  };
+
+  onGridClick = (dayIndex, start) => {
+    const workWeek = this.state.data;
+    const work = new Work(this.props.projects[0].tasks[0], start, start + 1);
+    work.hasLunchTime = workWeek.hasLunchTime;
+    work.lunchTime = workWeek.lunchTime;
+    work.workTime = [workWeek.startTime, workWeek.endTime];
+    work.dayIndex = dayIndex;
+    this.setState(prevState => ({
+      workWeek: [...prevState.workWeek, work]
+    }));
+  };
 }

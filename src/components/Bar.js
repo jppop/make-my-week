@@ -25,7 +25,8 @@ export class Bar extends Component {
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     dragSizeIncrement: PropTypes.number,
     maxWidth: PropTypes.number,
-    boundsSelector: PropTypes.string
+    boundsSelector: PropTypes.string,
+    onWorkItemUpdate: PropTypes.func
   };
 
   static defaultProps = {
@@ -43,7 +44,7 @@ export class Bar extends Component {
     let color = Color(this.props.color);
     const style = {
       backgroundColor: this.props.color,
-      color: color.isDark() ? "white" : "black"
+      color: color.isDark() ? "white" : "black",
     };
     return (
       <Rnd
@@ -62,19 +63,32 @@ export class Bar extends Component {
         onResize={(e, direction, ref, d, position) => {
           let width = ref.offsetWidth;
           let duration = width / this.props.unit[0];
+          // round duration up to the nearest quater of hour
+          duration = Math.ceil((duration*100)/25.0) * 25 / 100;
           let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
           workItem.end = workItem.start + duration;
+          if (this.props.onWorkItemUpdate) {
+            let newWorkItem = this.props.onWorkItemUpdate(workItem);
+            if (newWorkItem) {
+              workItem = newWorkItem;
+            }
+          }
           this.setState({
             workItem: workItem
           });
         }}
         onDragStop={(e, data) => {
-          console.log(data);
           let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
           const duration = workItem.duration();
           workItem.start = workItem.workTime[0] + (data.lastX / this.props.unit[0]);
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / this.props.unit[1];
+          if (this.props.onWorkItemUpdate) {
+            let newWorkItem = this.props.onWorkItemUpdate(workItem);
+            if (newWorkItem) {
+              workItem = newWorkItem;
+            }
+          }
           this.setState({
             x: data.lastX,
             y: data.lastY,

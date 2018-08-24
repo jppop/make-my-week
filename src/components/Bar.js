@@ -8,15 +8,17 @@ export class Bar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: props.text,
+      workItem: props.workItem,
       width: props.width,
-      x: props.x
-    }
+      x: props.x,
+      y: props.y
+    };
   }
 
   static propTypes = {
+    workItem: PropTypes.object.isRequired,
+    unit: PropTypes.arrayOf(PropTypes.number).isRequired,
     color: PropTypes.string,
-    text: PropTypes.string,
     x: PropTypes.number,
     y: PropTypes.number,
     width: PropTypes.number,
@@ -28,7 +30,6 @@ export class Bar extends Component {
 
   static defaultProps = {
     color: "crimson",
-    text: "",
     x: 0,
     y: 0,
     width: 100,
@@ -54,20 +55,24 @@ export class Bar extends Component {
           height: this.props.height
         }}
         onResizeStop={(e, direction, ref, d, position) => {
-           this.setState({
-             width: this.state.width + d.width
-           });
+          this.setState({
+            width: this.state.width + d.width
+          });
         }}
-        // onResize={(e, direction, ref, d, position) => {
-        //     this.setState({
-        //         text: this.state.width + d.width,
-        //     });
-        // }}
+        onResize={(e, direction, ref, d, position) => {
+          let width = ref.offsetWidth;
+          let duration = width / this.props.unit[0];
+          let workItem = Object.assign( Object.create( Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
+          workItem.end = workItem.start + duration;
+          this.setState({
+            workItem: workItem
+          });
+        }}
         onDragStop={(e, data) => {
-          console.log(data)
-           this.setState({
-             x: data.lastX
-           });
+          console.log(data);
+          this.setState({
+            x: data.lastX
+          });
         }}
         enableResizing={{
           top: false,
@@ -86,7 +91,7 @@ export class Bar extends Component {
         maxWidth={this.props.maxWidth}
         bounds={this.props.boundsSelector}
       >
-        {this.state.text}
+        {this.state.workItem.durationAsString()}
       </Rnd>
     );
   }

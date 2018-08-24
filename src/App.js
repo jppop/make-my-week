@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import "./App.css";
-import TimeGrid from "./components/TimeGrid";
 import WorkWeekGrid from "./components/WorkWeekGrid";
 
 class Project {
@@ -67,25 +66,6 @@ class Work {
   }
 }
 
-let data = {
-  start: 8,
-  end: 19,
-  lunchTime: { start: 12, end: 14 },
-  timelines: [
-    {
-      worker: "me",
-      works: [
-        new Work(projects[0].tasks[0], 8, 9),
-        new Work(projects[0].tasks[1], 9, 11.25),
-        new Work(projects[1].tasks[0], 14, 18)
-      ]
-    },
-    {
-      worker: "other",
-      works: [new Work(projects[0].tasks[0], 8, 19)]
-    }
-  ]
-};
 
 class WorkWeek {
   constructor(day) {
@@ -120,7 +100,7 @@ workWeek.addWork(0, new Work(projects[1].tasks[0], 14, 18));
 workWeek.addWork(new Date(2018, 7, 21), new Work(projects[0].tasks[0], 8, 18));
 workWeek.addWork(4, new Work(projects[0].tasks[0], 8, 9));
 workWeek.addWork(4, new Work(projects[0].tasks[1], 9, 11.25));
-workWeek.addWork(4, new Work(projects[1].tasks[0], 14, 18));
+workWeek.addWork(4, new Work(projects[1].tasks[0], 13, 18));
 
 console.log(workWeek);
 
@@ -128,7 +108,6 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <TimeGrid data={data} />
         <WorkWeekGrid data={workWeek} />
       </div>
     );

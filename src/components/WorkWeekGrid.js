@@ -278,6 +278,8 @@ export default class WorkWeekGrid extends Component {
         return timeline.works.map((work, workIndex) => {
           return (
             <Bar
+              workItem={work}
+              unit={[props.cellWidth + 2, props.cellHeight + 2]}
               key={"work#" + day.getDate() + "-" + workIndex}
               boundsSelector={props.boundsSelector}
               dragSizeIncrement={props.quarterWidth}
@@ -286,7 +288,6 @@ export default class WorkWeekGrid extends Component {
               y={(props.cellHeight + 2) * dayIndex}
               width={(props.cellWidth + 2) * work.duration() - 1}
               color={work.color}
-              text={work.durationAsString()}
             />
           );
         });

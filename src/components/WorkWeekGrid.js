@@ -3,7 +3,8 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import Bar from "./Bar";
 import moment from "moment";
-import { WorkWeek, Work, Task, Project } from "../domain/WorkWeek";
+import { WorkWeek, Work } from "../domain/WorkWeek";
+import Log from "../Log";
 
 const QUATER_WIDTH = 16;
 
@@ -328,7 +329,6 @@ export default class WorkWeekGrid extends Component {
   }
 
   onWorkItemUpdate = workItem => {
-    //    console.log(workItem);
   }
 
   onAddWorkItem = e => {
@@ -343,7 +343,7 @@ export default class WorkWeekGrid extends Component {
     const { clientX, clientY } = e;
     let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
     let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
-    console.log(`grid position : (${start}, ${dayIndex})`)
+    Log.trace(`grid position : (${start}, ${dayIndex})`)
 
     const work = Work.valueOf(this.props.projects[0].tasks[0], start, start + 1);
     WorkWeek.attach(this.props.data, dayIndex, work);
@@ -354,14 +354,14 @@ export default class WorkWeekGrid extends Component {
   }
 
   onRemoveWorkItem = (workItem) => {
-    console.log(workItem);
-    console.log(this.state.workWeek);
+    Log.trace(workItem);
+    Log.trace(this.state.workWeek);
     let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
-    console.log(`workIndex: ${workIndex}`);
+    Log.trace(`workIndex: ${workIndex}`);
     if (workIndex !== -1) {
       let newWorkWeek = [...this.state.workWeek];
       newWorkWeek.splice(workIndex, 1);
-      console.log(newWorkWeek);
+      Log.trace(newWorkWeek);
       this.setState({
         workWeek: newWorkWeek
       })

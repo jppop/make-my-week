@@ -359,7 +359,7 @@ export default class WorkWeekGrid extends Component {
     let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
     console.log(`workIndex: ${workIndex}`);
     if (workIndex !== -1) {
-      let newWorkWeek = [...this.state.workWeek]
+      let newWorkWeek = [...this.state.workWeek];
       newWorkWeek.splice(workIndex, 1);
       console.log(newWorkWeek);
       this.setState({

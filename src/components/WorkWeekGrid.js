@@ -297,6 +297,7 @@ export default class WorkWeekGrid extends Component {
             width={(props.cellWidth + 2) * work.duration() - 1}
             color={work.color}
             onWorkItemUpdate={this.onWorkItemUpdate}
+            contextMenuHandler={() => props.contextMenuHandler(work)}
           />
         );
       });
@@ -309,7 +310,7 @@ export default class WorkWeekGrid extends Component {
         <Scale start={this.props.data.startTime} end={this.props.data.endTime} />
         <Tick start={this.props.data.startTime} end={this.props.data.endTime} />
         <Grid workweek={this.props.data} />
-        <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this.onGridClick}>
+        <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this.onAddWorkItem}>
           <div>
             <Works
               workweek={this.state.workWeek}
@@ -318,6 +319,7 @@ export default class WorkWeekGrid extends Component {
               cellWidth={this.props.cellWidth}
               cellHeight={this.props.cellHeight}
               startTime={this.props.data.startTime}
+              contextMenuHandler={this.onRemoveWorkItem}
             />
           </div>
         </div>
@@ -327,15 +329,15 @@ export default class WorkWeekGrid extends Component {
 
   onWorkItemUpdate = workItem => {
     //    console.log(workItem);
-  };
+  }
 
-  onGridClick = e => {
+  onAddWorkItem = e => {
     if (e.target.id !== this.bounds.current.id) {
       return;
     }
     e.preventDefault();
 
-    const {hasLunchTime, lunchTime, startTime, endTime} = this.props.data;
+    const {startTime} = this.props.data;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect();
     const { clientX, clientY } = e;
@@ -343,14 +345,26 @@ export default class WorkWeekGrid extends Component {
     let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
     console.log(`grid position : (${start}, ${dayIndex})`)
 
-    const work = new Work(this.props.projects[0].tasks[0], start, start + 1);
+    const work = Work.valueOf(this.props.projects[0].tasks[0], start, start + 1);
+    WorkWeek.attach(this.props.data, dayIndex, work);
 
-    work.hasLunchTime = hasLunchTime;
-    work.lunchTime = lunchTime;
-    work.workTime = [startTime, endTime];
-    work.dayIndex = dayIndex;
     this.setState(prevState => ({
       workWeek: [...prevState.workWeek, work]
     }));
-  };
+  }
+
+  onRemoveWorkItem = (workItem) => {
+    console.log(workItem);
+    console.log(this.state.workWeek);
+    let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
+    console.log(`workIndex: ${workIndex}`);
+    if (workIndex !== -1) {
+      let newWorkWeek = [...this.state.workWeek]
+      newWorkWeek.splice(workIndex, 1);
+      console.log(newWorkWeek);
+      this.setState({
+        workWeek: newWorkWeek
+      })
+    }
+  }
 }

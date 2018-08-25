@@ -19,12 +19,23 @@ export class Task {
 }
 
 export class Work {
-  constructor(task, start, end) {
-    this.id = { project: task.projectId, task: task.id , work: Math.random().toString(36).substr(2)};
+  constructor(task, workId, start, end) {
+    this.id = {
+      project: task.projectId,
+      task: task.id,
+      work: workId
+    };
     this.start = start;
     this.end = end;
     this.color = task.color;
     this.hasLunchTime = true;
+  }
+  static valueOf(task, start, end) {
+    const workId = Math.random()
+      .toString(36)
+      .substr(2);
+    const work = new Work(task, workId, start, end);
+    return work;
   }
   duration(adjusted) {
     let duration;
@@ -40,7 +51,7 @@ export class Work {
       } else if (this.start <= a && this.end <= b) {
         duration = a - this.start;
       } else {
-        duration = (a - this.start) + (this.end - b);
+        duration = a - this.start + (this.end - b);
       }
     } else {
       duration = this.end - this.start;
@@ -64,23 +75,37 @@ export class WorkWeek {
     this.startTime = 8;
     this.endTime = 19;
     this.daysPerWeek = daysPerWeek || 5;
-    this.timelines = Array(this.daysPerWeek).fill(null).map( () => { return {works: []}; } );
+    this.timelines = Array(this.daysPerWeek)
+      .fill(null)
+      .map(() => {
+        return { works: [] };
+      });
   }
 
   addWork(day, work) {
+    WorkWeek.addWeekWork(this, day, work);
+  }
+
+  static addWeekWork(workWeek, day, work) {
+    WorkWeek.attach(workWeek, day, work);
+
+    if (work.dayIndex >= 0 && work.dayIndex < workWeek.daysPerWeek) {
+      workWeek.timelines[work.dayIndex].works.push(work);
+    }
+  }
+
+  static attach(workWeek, day, work) {
     let dayIndex;
     if (day instanceof Date) {
       dayIndex = day.getDay() - 1;
     } else {
       dayIndex = day;
     }
-    if (dayIndex >= 0 && dayIndex < this.daysPerWeek) {
-      work.hasLunchTime = this.hasLunchTime;
-      work.lunchTime = this.lunchTime;
-      work.workTime = [this.startTime, this.endTime];
-      work.dayIndex = dayIndex;
-      this.timelines[dayIndex].works.push(work);
-    }
+    const {hasLunchTime, lunchTime, startTime, endTime} = workWeek;
+    work.hasLunchTime = hasLunchTime;
+    work.lunchTime = lunchTime;
+    work.workTime = [startTime, endTime];
+    work.dayIndex = dayIndex;
+    return work;
   }
 }
-

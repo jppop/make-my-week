@@ -26,7 +26,8 @@ export class Bar extends Component {
     dragSizeIncrement: PropTypes.number,
     maxWidth: PropTypes.number,
     boundsSelector: PropTypes.string,
-    onWorkItemUpdate: PropTypes.func
+    onWorkItemUpdate: PropTypes.func,
+    contextMenuHandler: PropTypes.func
   };
 
   static defaultProps = {
@@ -37,14 +38,16 @@ export class Bar extends Component {
     height: "auto",
     dragSizeIncrement: 1,
     maxWidth: undefined,
-    boundsSelector: undefined
+    boundsSelector: undefined,
+    onWorkItemUpdate: () => {},
+    contextMenuHandler: () => {}
   };
 
   render() {
     let color = Color(this.props.color);
     const style = {
       backgroundColor: this.props.color,
-      color: color.isDark() ? "white" : "black",
+      color: color.isDark() ? "white" : "black"
     };
     return (
       <Rnd
@@ -64,7 +67,7 @@ export class Bar extends Component {
           let width = ref.offsetWidth;
           let duration = width / this.props.unit[0];
           // round duration up to the nearest quater of hour
-          duration = Math.ceil((duration*100)/25.0) * 25 / 100;
+          duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100;
           let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
           workItem.end = workItem.start + duration;
           if (this.props.onWorkItemUpdate) {
@@ -80,7 +83,7 @@ export class Bar extends Component {
         onDragStop={(e, data) => {
           let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
           const duration = workItem.duration();
-          workItem.start = workItem.workTime[0] + (data.lastX / this.props.unit[0]);
+          workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / this.props.unit[1];
           if (this.props.onWorkItemUpdate) {
@@ -112,10 +115,17 @@ export class Bar extends Component {
         maxWidth={this.props.maxWidth}
         bounds={this.props.boundsSelector}
       >
-        {this.state.workItem.durationAsString()}
+        <span onContextMenu={this.onContextMenu}>
+          {this.state.workItem.durationAsString()}
+        </span>
       </Rnd>
     );
+
   }
+  onContextMenu = e => {
+    e.preventDefault();
+    this.props.contextMenuHandler(this.state.workItem);
+  };
 }
 
 export default Bar;

@@ -1,35 +1,33 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+// @flow
+import * as React from "react";
 import { Rnd } from "react-rnd";
 import Color from "color";
 
 // see https://github.com/bokuweb/react-rnd
-export class Bar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      workItem: props.workItem,
-      width: props.width,
-      x: props.x,
-      y: props.y
-    };
-  }
 
-  static propTypes = {
-    workItem: PropTypes.object.isRequired,
-    unit: PropTypes.arrayOf(PropTypes.number).isRequired,
-    color: PropTypes.string,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    width: PropTypes.number,
-    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    dragSizeIncrement: PropTypes.number,
-    maxWidth: PropTypes.number,
-    boundsSelector: PropTypes.string,
-    onWorkItemUpdate: PropTypes.func,
-    contextMenuHandler: PropTypes.func
-  };
+type Props = {
+  workItem: any, // CHANGE
+  unit: number[],
+  color: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number | string,
+  dragSizeIncrement: number,
+  maxWidth: number,
+  boundsSelector: string,
+  onWorkItemUpdate: any => any, // CHANGE
+  contextMenuHandler: any => any
+};
 
+type State = {
+  workItem: any, // CHANGE
+  width: number,
+  x: number,
+  y: number
+};
+
+export class Bar extends React.Component<Props, State> {
   static defaultProps = {
     color: "crimson",
     x: 0,
@@ -42,6 +40,22 @@ export class Bar extends Component {
     onWorkItemUpdate: () => {},
     contextMenuHandler: () => {}
   };
+
+  state = {
+    workItem: this.props.workItem,
+    width: this.props.width,
+    x: this.props.x,
+    y: this.props.y
+  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      workItem: props.workItem,
+      width: props.width,
+      x: props.x,
+      y: props.y
+    };
+  }
 
   render() {
     let color = Color(this.props.color);
@@ -115,14 +129,11 @@ export class Bar extends Component {
         maxWidth={this.props.maxWidth}
         bounds={this.props.boundsSelector}
       >
-        <span onContextMenu={this.onContextMenu}>
-          {this.state.workItem.durationAsString()}
-        </span>
+        <span onContextMenu={this.onContextMenu}>{this.state.workItem.durationAsString()}</span>
       </Rnd>
     );
-
   }
-  onContextMenu = e => {
+  onContextMenu = (e: SyntheticMouseEvent<HTMLElement>) => {
     e.preventDefault();
     this.props.contextMenuHandler(this.state.workItem);
   };

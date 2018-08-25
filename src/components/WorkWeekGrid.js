@@ -332,7 +332,7 @@ export default class WorkWeekGrid extends Component {
   }
 
   onAddWorkItem = e => {
-    if (e.target.id !== this.bounds.current.id) {
+    if (e.currentTarget.id !== this.bounds.current.id) {
       return;
     }
     e.preventDefault();

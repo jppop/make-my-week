@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import Bar from "./Bar";
 import moment from "moment";
@@ -35,6 +36,8 @@ export default class WorkWeekGrid extends Component {
     this.state = {
       workWeek: workWeek
     };
+
+    this.bounds = React.createRef();
 
     const styles = {
       container: {
@@ -306,7 +309,7 @@ export default class WorkWeekGrid extends Component {
         <Scale start={this.props.data.startTime} end={this.props.data.endTime} />
         <Tick start={this.props.data.startTime} end={this.props.data.endTime} />
         <Grid workweek={this.props.data} />
-        <div id="bounds" style={boundStyle}>
+        <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this.onGridClick}>
           <div>
             <Works
               workweek={this.state.workWeek}
@@ -327,16 +330,24 @@ export default class WorkWeekGrid extends Component {
   };
 
   onGridClick = e => {
-    console.log(e.target);
-    let { clientX, clientY } = e;
-    console.log(clientX, clientY);
-    return;
-    let dayIndex, start;
-    const workWeek = this.state.data;
+    if (e.target.id !== this.bounds.current.id) {
+      return;
+    }
+    e.preventDefault();
+
+    const {hasLunchTime, lunchTime, startTime, endTime} = this.props.data;
+
+    const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect();
+    const { clientX, clientY } = e;
+    let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
+    let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
+    console.log(`grid position : (${start}, ${dayIndex})`)
+
     const work = new Work(this.props.projects[0].tasks[0], start, start + 1);
-    work.hasLunchTime = workWeek.hasLunchTime;
-    work.lunchTime = workWeek.lunchTime;
-    work.workTime = [workWeek.startTime, workWeek.endTime];
+
+    work.hasLunchTime = hasLunchTime;
+    work.lunchTime = lunchTime;
+    work.workTime = [startTime, endTime];
     work.dayIndex = dayIndex;
     this.setState(prevState => ({
       workWeek: [...prevState.workWeek, work]

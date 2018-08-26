@@ -6,7 +6,7 @@ module.exports = {
     "extends": [
       "eslint:recommended",
       "plugin:react/recommended",
-      // "plugin:flowtype/recommended"
+//      "plugin:flowtype/recommended"
     ],
     "parserOptions": {
         "ecmaFeatures": {
@@ -17,7 +17,7 @@ module.exports = {
     },
     "plugins": [
         "react",
-        // "flowtype"
+        "flowtype"
     ],
     "rules": {
         "indent": [
@@ -30,11 +30,13 @@ module.exports = {
         ],
         "quotes": [
             "error",
-            "double"
+            "single"
         ],
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "no-console": 0,
+        "no-undef": 0,
     }
 };

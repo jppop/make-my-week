@@ -18,12 +18,15 @@
     "start": "DEBUG=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "styleguide": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "devDependencies": {
     "eslint": "^5.4.0",
     "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-react": "^7.11.1",
-    "flow-bin": "^0.79.1"
+    "flow-bin": "^0.79.1",
+    "react-styleguidist": "^7.2.5"
   }
 }

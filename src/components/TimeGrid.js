@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import Bar from "./Bar";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import Bar from './Bar';
 
 const QUATER_WIDTH = 16;
 
@@ -29,16 +29,16 @@ export default class TimeGrid extends Component {
 
     const styles = {
       container: {
-        position: "relative",
-        fontFamily: "'Roboto', sans-serif",
+        position: 'relative',
+        fontFamily: '\'Roboto\', sans-serif',
         fontSize: 12
       },
 
       grid: isFirstChild => {
         let style = {
-          display: "table",
+          display: 'table',
           borderSpacing: 0,
-          border: "1px solid darkgray",
+          border: '1px solid darkgray',
         };
         if (isFirstChild) {
           style.marginTop = -1;
@@ -47,20 +47,20 @@ export default class TimeGrid extends Component {
       },
 
       gridRow: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0
       },
 
       gridCell: (isFirstChild, isLastChild) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid darkgray",
-          textAlign: "center",
-          cursor: "crosshair"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid darkgray',
+          textAlign: 'center',
+          cursor: 'crosshair'
         };
         let firstChildStyle = {};
         let lastChildStyle = {};
@@ -68,38 +68,38 @@ export default class TimeGrid extends Component {
           firstChildStyle = {
             width: this.props.leftMargin,
             minWidth: this.props.leftMargin,
-            cursor: "default"
+            cursor: 'default'
           };
         } else if (isLastChild) {
           firstChildStyle = {
             width: this.props.leftMargin,
             minWidth: this.props.leftMargin,
-            cursor: "default",
-            borderRight: "1px solid transparent"
+            cursor: 'default',
+            borderRight: '1px solid transparent'
           };
         }
         return { ...style, ...firstChildStyle, ...lastChildStyle };
       },
 
       scale: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: '1px solid transparent'
       },
 
       scaleRow: {
-        display: "table-row"
+        display: 'table-row'
       },
 
       scaleCell: (isFirstChild, isLastChild) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid transparent",
-          textAlign: "left"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid transparent',
+          textAlign: 'left'
         };
         if (isFirstChild) {
           style.width = this.props.leftMargin;
@@ -109,42 +109,42 @@ export default class TimeGrid extends Component {
       },
 
       tick: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: '1px solid transparent'
       },
 
       tickRow: {
-        display: "table-row"
+        display: 'table-row'
       },
 
       tickCell: (isFirstChild, isLastChild) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid darkgray"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid darkgray'
         };
         if (isFirstChild) {
           style.width = this.props.leftMargin;
           style.minWidth = this.props.leftMargin;
         } else if (isLastChild) {
-          style.borderRight = "1px solid transparent";
+          style.borderRight = '1px solid transparent';
         }
         return style;
       },
       bounds: index => {
         return {
-          position: "absolute",
+          position: 'absolute',
           left: this.props.leftMargin + 3,
           top: (this.props.cellHeight + 2) * (index + 2),
           height: this.props.cellHeight,
           maxHeight: this.props.cellHeight,
           width: (this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start),
           maxWidth: (this.props.cellWidth + 2) * (this.props.data.end - this.props.data.start),
-          cursor: "crosshair"
+          cursor: 'crosshair'
         };
       }
     };
@@ -170,8 +170,8 @@ export default class TimeGrid extends Component {
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
           <GridCell
-            key={"grid-cell#" + cell.toString()}
-            id={"grid-cell#" + cell.toString()}
+            key={'grid-cell#' + cell.toString()}
+            id={'grid-cell#' + cell.toString()}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
           >
@@ -199,11 +199,11 @@ export default class TimeGrid extends Component {
       for (let hour = props.start - 1; hour <= props.end; hour++) {
         cells.push(
           <ScaleCell
-            key={"grid-scale#" + hour.toString()}
+            key={'grid-scale#' + hour.toString()}
             isFirstChild={hour < props.start}
             isLastChild={!(hour < props.end)}
           >
-            {hour < props.start ? "" : hour.toString().padStart(2, "0") + ":00"}
+            {hour < props.start ? '' : hour.toString().padStart(2, '0') + ':00'}
           </ScaleCell>
         );
       }
@@ -223,7 +223,7 @@ export default class TimeGrid extends Component {
       const cellCount = 1 + props.end - props.start + 1;
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
-          <TickCell key={"grid-tick#" + cell.toString()} isFirstChild={cell === 0} isLastChild={cell === cellCount - 1}>
+          <TickCell key={'grid-tick#' + cell.toString()} isFirstChild={cell === 0} isLastChild={cell === cellCount - 1}>
             &nbsp;
           </TickCell>
         );
@@ -240,7 +240,7 @@ export default class TimeGrid extends Component {
       return props.works.map((work, index) => {
         return (
           <Bar
-            key={"work#" + index}
+            key={'work#' + index}
             boundsSelector={props.boundsSelector}
             dragSizeIncrement={props.quarterWidth}
             maxWidth={props.maxWidth}
@@ -264,7 +264,7 @@ export default class TimeGrid extends Component {
             <Works
               works={timeline.works}
               start={this.props.data.start}
-              boundsSelector={"#" + boundsId}
+              boundsSelector={'#' + boundsId}
               quarterWidth={this.props.quarterWidth}
               maxWidth={maxWidth}
               cellWidth={this.props.cellWidth}

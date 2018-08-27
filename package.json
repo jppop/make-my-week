@@ -10,23 +10,32 @@
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-rnd": "^9.0.1",
-    "react-scripts": "1.1.4",
-    "semantic-ui-css": "^2.3.1",
-    "semantic-ui-react": "^0.79.1"
+    "react-scripts": "1.1.5"
   },
   "scripts": {
+    "lint": "eslint src/**/*.js --ignore-pattern node_modules/; exit 0",
     "start": "DEBUG=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "styleguide": "styleguidist server",
-    "styleguide:build": "styleguidist build"
+    "styleguide:build": "styleguidist build",
+    "flow start": "flow start",
+    "flow stop": "flow stop",
+    "flow status": "flow status",
+    "flow coverage": "flow coverage"
   },
   "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "babel-preset-flow": "^6.23.0",
     "eslint": "^5.4.0",
+    "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.11.1",
     "flow-bin": "^0.79.1",
+    "prettier-eslint": "^8.8.2",
     "react-styleguidist": "^7.2.5"
   }
 }

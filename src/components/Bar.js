@@ -1,8 +1,8 @@
 // @flow
-import * as React from 'react'
-import { Rnd } from 'react-rnd'
-import Color from 'color'
-import { Work } from '../domain/WorkWeek'
+import * as React from 'react';
+import { Rnd } from 'react-rnd';
+import Color from 'color';
+import { Work } from '../domain/WorkWeek';
 
 // see https://github.com/bokuweb/react-rnd
 
@@ -20,14 +20,14 @@ type Props = {
   boundsSelector: string,
   onWorkItemUpdate: Work => Work,
   contextMenuHandler: Work => Work
-}
+};
 
 type State = {
   workItem: any, // CHANGE
   width: number,
   x: number,
   y: number
-}
+};
 
 /**
  * A time bar resizable and draggable.
@@ -48,30 +48,30 @@ export class Bar extends React.Component<Props, State> {
     boundsSelector: undefined,
     onWorkItemUpdate: () => {},
     contextMenuHandler: () => {}
-  }
+  };
 
   state = {
     workItem: this.props.workItem,
     width: this.props.width,
     x: this.props.x,
     y: this.props.y
-  }
+  };
   constructor(props: Props) {
-    super(props)
+    super(props);
     this.state = {
       workItem: props.workItem,
       width: props.width,
       x: props.x,
       y: props.y
-    }
+    };
   }
 
   render() {
-    let color = Color(this.props.color)
+    let color = Color(this.props.color);
     const style = {
       backgroundColor: this.props.color,
       color: color.isDark() ? 'white' : 'black'
-    }
+    };
     return (
       <Rnd
         style={style}
@@ -84,43 +84,43 @@ export class Bar extends React.Component<Props, State> {
         onResizeStop={(e, direction, ref, d, position) => {
           this.setState({
             width: this.state.width + d.width
-          })
+          });
         }}
         onResize={(e, direction, ref, d, position) => {
-          let width = ref.offsetWidth
-          let duration = width / this.props.unit[0]
+          let width = ref.offsetWidth;
+          let duration = width / this.props.unit[0];
           // round duration up to the nearest quater of hour
-          duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100
-          let workItem = this.state.workItem.clone()
-          workItem.end = workItem.start + duration
+          duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100;
+          let workItem = this.state.workItem.clone();
+          workItem.end = workItem.start + duration;
           if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(workItem)
+            let newWorkItem = this.props.onWorkItemUpdate(workItem);
             if (newWorkItem) {
-              workItem = newWorkItem
+              workItem = newWorkItem;
             }
           }
           this.setState({
             workItem: workItem
-          })
+          });
         }}
         onDragStop={(e, data) => {
-          let workItem = this.state.workItem.clone()
-          const duration = workItem.duration()
+          let workItem = this.state.workItem.clone();
+          const duration = workItem.duration();
           // $FlowFixMe
-          workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0]
-          workItem.end = workItem.start + duration
-          workItem.dayIndex = data.lastY / this.props.unit[1]
+          workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
+          workItem.end = workItem.start + duration;
+          workItem.dayIndex = data.lastY / this.props.unit[1];
           if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(workItem)
+            let newWorkItem = this.props.onWorkItemUpdate(workItem);
             if (newWorkItem) {
-              workItem = newWorkItem
+              workItem = newWorkItem;
             }
           }
           this.setState({
             x: data.lastX,
             y: data.lastY,
             workItem: workItem
-          })
+          });
         }}
         enableResizing={{
           top: false,
@@ -141,12 +141,12 @@ export class Bar extends React.Component<Props, State> {
       >
         <span onContextMenu={this.onContextMenu}>{this.state.workItem.durationAsString()}</span>
       </Rnd>
-    )
+    );
   }
   onContextMenu = (e: SyntheticMouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    this.props.contextMenuHandler(this.state.workItem)
-  }
+    e.preventDefault();
+    this.props.contextMenuHandler(this.state.workItem);
+  };
 }
 
-export default Bar
+export default Bar;

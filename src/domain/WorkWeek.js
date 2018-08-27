@@ -27,7 +27,7 @@ export class Task {
     this.id = id;
     this.label = label;
     this.color = color;
-    this.projectId = "none";
+    this.projectId = 'none';
   }
 }
 
@@ -99,7 +99,7 @@ export class Work {
     const duration = this.duration(true);
     let hour = Math.trunc(duration);
     let minutes = (duration - hour) * 60;
-    return hour.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+    return hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
   }
 }
 type DayWork = {

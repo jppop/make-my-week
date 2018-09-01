@@ -17,7 +17,7 @@ export default class WorkWeekGrid extends Component {
     leftMargin: PropTypes.number,
     rightMargin: PropTypes.number,
     quarterWidth: PropTypes.number
-  }
+  };
 
   static defaultProps = {
     cellHeight: 14,
@@ -25,10 +25,12 @@ export default class WorkWeekGrid extends Component {
     quarterWidth: QUATER_WIDTH,
     leftMargin: 40,
     rightMargin: 20
-  }
+  };
 
   constructor(props) {
     super(props);
+
+    this.dragging = false;
 
     const workWeek = [];
     props.data.timelines.forEach(timeline => {
@@ -299,6 +301,8 @@ export default class WorkWeekGrid extends Component {
             color={work.color}
             onWorkItemUpdate={this.onWorkItemUpdate}
             contextMenuHandler={() => props.contextMenuHandler(work)}
+            onDragStart={(e, data) => props.dragStartHandler(e, data)}
+            onDragStop={(e, data) => props.dragStopHandler(e, data)}
           />
         );
       });
@@ -321,6 +325,8 @@ export default class WorkWeekGrid extends Component {
               cellHeight={this.props.cellHeight}
               startTime={this.props.data.startTime}
               contextMenuHandler={this.onRemoveWorkItem}
+              dragStartHandler={this.onDragStart}
+              dragStopHandler={this.onDragStop}
             />
           </div>
         </div>
@@ -328,7 +334,18 @@ export default class WorkWeekGrid extends Component {
     );
   }
 
-  onWorkItemUpdate = workItem => {}
+  onWorkItemUpdate = workItem => {
+    let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
+    Log.trace(`workIndex: ${workIndex}`, 'WorkWeekGrid:onWorkItemUpdate');
+    if (workIndex !== -1) {
+      let newWorkWeek = [...this.state.workWeek];
+      newWorkWeek.splice(workIndex, 1, workItem);
+      Log.trace(newWorkWeek);
+      this.setState({
+        workWeek: newWorkWeek
+      });
+    }
+  };
 
   onAddWorkItem = e => {
     if (e.currentTarget.id !== this.bounds.current.id) {
@@ -336,6 +353,11 @@ export default class WorkWeekGrid extends Component {
     }
     e.preventDefault();
 
+    // workaround: when dragging, still receiving an Click event
+    if (this.dragging) {
+      this.dragging = false;
+      return;
+    }
     const { startTime } = this.props.data;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect();
@@ -350,7 +372,17 @@ export default class WorkWeekGrid extends Component {
     this.setState(prevState => ({
       workWeek: [...prevState.workWeek, work]
     }));
-  }
+  };
+
+  onDragStart = (e, data) => {
+    Log.trace('dragging starting...');
+    this.dragging = true;
+  };
+
+  onDragStop = (e, data) => {
+    Log.trace('dragging stopped...');
+    //    this.dragging = false;
+  };
 
   onRemoveWorkItem = workItem => {
     Log.trace(workItem);
@@ -365,5 +397,5 @@ export default class WorkWeekGrid extends Component {
         workWeek: newWorkWeek
       });
     }
-  }
+  };
 }

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Rnd } from 'react-rnd';
+import { Rnd, type RndDragCallback } from 'react-rnd';
 import Color from 'color';
 import { Work } from '../domain/WorkWeek';
 
@@ -19,7 +19,9 @@ type Props = {
   maxWidth: number,
   boundsSelector: string,
   onWorkItemUpdate: Work => Work,
-  contextMenuHandler: Work => Work
+  contextMenuHandler: Work => Work,
+  onDragStart: RndDragCallback,
+  onDragStop: RndDragCallback
 };
 
 type State = {
@@ -47,7 +49,9 @@ export class Bar extends React.Component<Props, State> {
     maxWidth: undefined,
     boundsSelector: undefined,
     onWorkItemUpdate: () => {},
-    contextMenuHandler: () => {}
+    contextMenuHandler: () => {},
+    onDragStart: () => {},
+    onDragStop: () => {}
   };
 
   state = {
@@ -82,9 +86,14 @@ export class Bar extends React.Component<Props, State> {
           height: this.props.height
         }}
         onResizeStop={(e, direction, ref, d, position) => {
-          this.setState({
-            width: this.state.width + d.width
-          });
+          let newState = { width: this.state.width + d.width, workItem: undefined };
+          if (this.props.onWorkItemUpdate) {
+            let newWorkItem = this.props.onWorkItemUpdate(this.state.workItem);
+            if (newWorkItem) {
+              newState.workItem = newWorkItem;
+            }
+          }
+          this.setState(newState);
         }}
         onResize={(e, direction, ref, d, position) => {
           let width = ref.offsetWidth;
@@ -93,17 +102,15 @@ export class Bar extends React.Component<Props, State> {
           duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100;
           let workItem = this.state.workItem.clone();
           workItem.end = workItem.start + duration;
-          if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(workItem);
-            if (newWorkItem) {
-              workItem = newWorkItem;
-            }
-          }
           this.setState({
             workItem: workItem
           });
         }}
+        onDragStart={(e, data) => {
+          this.props.onDragStart(e, data);
+        }}
         onDragStop={(e, data) => {
+          this.props.onDragStop(e, data);
           let workItem = this.state.workItem.clone();
           const duration = workItem.duration();
           // $FlowFixMe

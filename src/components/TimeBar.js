@@ -25,7 +25,7 @@ type Props = {
 };
 
 type State = {
-  workItem: any, // CHANGE
+  workItem: Work,
   width: number,
   x: number,
   y: number
@@ -38,7 +38,7 @@ type State = {
  * @class Bar
  * @extends {React.Component<Props, State>}
  */
-export class Bar extends React.Component<Props, State> {
+export class TimeBar extends React.Component<Props, State> {
   static defaultProps = {
     color: 'crimson',
     x: 0,
@@ -156,4 +156,4 @@ export class Bar extends React.Component<Props, State> {
   };
 }
 
-export default Bar;
+export default TimeBar;

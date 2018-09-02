@@ -1,7 +1,6 @@
 // @flow
 
 export class Project {
-
   id: string;
   label: string;
   tasks: Task[];
@@ -14,6 +13,13 @@ export class Project {
   addTask(task: Task) {
     task.projectId = this.id;
     this.tasks.push(task);
+  }
+  getTask(id: string): Task | null {
+    let index = this.tasks.findIndex(task => task.id === id);
+    if (index < 0) {
+      return null;
+    }
+    return this.tasks[index];
   }
 }
 
@@ -35,13 +41,12 @@ type WorkId = {
   project: string,
   task: string,
   work: string
-}
+};
 type LunchTime = {
-  start: number;
-  end: number;
-}
+  start: number,
+  end: number
+};
 export class Work {
-
   id: WorkId;
   start: number;
   end: number;
@@ -49,7 +54,7 @@ export class Work {
   hasLunchTime: ?boolean;
   lunchTime: ?LunchTime;
   dayIndex: ?number;
-  workTime: ?number[];
+  workTime: ?(number[]);
 
   constructor(task: Task, workId: string, start: number, end: number) {
     this.id = {
@@ -104,7 +109,7 @@ export class Work {
 }
 type DayWork = {
   works: Work[]
-}
+};
 export class WorkWeek {
   day: Date;
   hasLunchTime: boolean;
@@ -147,7 +152,7 @@ export class WorkWeek {
     } else {
       dayIndex = day;
     }
-    const {hasLunchTime, lunchTime, startTime, endTime} = workWeek;
+    const { hasLunchTime, lunchTime, startTime, endTime } = workWeek;
     work.hasLunchTime = hasLunchTime;
     work.lunchTime = lunchTime;
     work.workTime = [startTime, endTime];

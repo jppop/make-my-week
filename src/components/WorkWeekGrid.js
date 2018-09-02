@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import Bar from './Bar';
+import TimeBar from './TimeBar';
 import moment from 'moment';
 import { WorkWeek, Work } from '../domain/WorkWeek';
 import Log from '../Log';
@@ -288,7 +288,7 @@ export default class WorkWeekGrid extends Component {
     const Works = props => {
       return props.workweek.map(work => {
         return (
-          <Bar
+          <TimeBar
             workItem={work}
             unit={[props.cellWidth + 2, props.cellHeight + 2]}
             key={'work#' + work.id.work}

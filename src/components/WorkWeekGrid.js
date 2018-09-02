@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import PropTypes from "prop-types";
-import Bar from "./Bar";
-import moment from "moment";
-import { WorkWeek, Work } from "../domain/WorkWeek";
-import Log from "../Log";
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+import TimeBar from './TimeBar';
+import moment from 'moment';
+import { WorkWeek, Work } from '../domain/WorkWeek';
+import Log from '../Log';
 
 const QUATER_WIDTH = 16;
 
@@ -30,6 +30,8 @@ export default class WorkWeekGrid extends Component {
   constructor(props) {
     super(props);
 
+    this.dragging = false;
+
     const workWeek = [];
     props.data.timelines.forEach(timeline => {
       return timeline.works.map(work => workWeek.push(work));
@@ -42,17 +44,17 @@ export default class WorkWeekGrid extends Component {
 
     const styles = {
       container: {
-        position: "relative",
-        fontFamily: "'Roboto', sans-serif",
+        position: 'relative',
+        fontFamily: '\'Roboto\', sans-serif',
         fontSize: 12,
         zIndex: 0
       },
 
       grid: isFirstChild => {
         let style = {
-          display: "table",
+          display: 'table',
           borderSpacing: 0,
-          border: "1px solid darkgray"
+          border: '1px solid darkgray'
         };
         if (isFirstChild) {
           style.marginTop = -1;
@@ -61,20 +63,20 @@ export default class WorkWeekGrid extends Component {
       },
 
       gridRow: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0
       },
 
       gridCell: (isFirstChild, isLastChild, lunchTime) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid darkgray",
-          textAlign: "center",
-          cursor: "crosshair"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid darkgray',
+          textAlign: 'center',
+          cursor: 'crosshair'
         };
         let firstChildStyle = {};
         let lastChildStyle = {};
@@ -82,43 +84,43 @@ export default class WorkWeekGrid extends Component {
           firstChildStyle = {
             width: this.props.leftMargin,
             minWidth: this.props.leftMargin,
-            cursor: "default",
-            color: "darkgray",
-            textAlign: "right"
+            cursor: 'default',
+            color: 'darkgray',
+            textAlign: 'right'
           };
         } else if (isLastChild) {
           lastChildStyle = {
             width: this.props.rightMargin,
             minWidth: this.props.rightMargin,
-            cursor: "default",
-            borderRight: "1px solid transparent"
+            cursor: 'default',
+            borderRight: '1px solid transparent'
           };
         }
         if (lunchTime) {
-          style.backgroundColor = "#e6e6e6";
+          style.backgroundColor = '#e6e6e6';
         }
         return { ...style, ...firstChildStyle, ...lastChildStyle };
       },
 
       scale: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: '1px solid transparent'
       },
 
       scaleRow: {
-        display: "table-row"
+        display: 'table-row'
       },
 
       scaleCell: (isFirstChild, isLastChild) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid transparent",
-          textAlign: "left"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid transparent',
+          textAlign: 'left'
         };
         if (isFirstChild) {
           style.width = this.props.leftMargin;
@@ -128,35 +130,35 @@ export default class WorkWeekGrid extends Component {
       },
 
       tick: {
-        display: "table",
+        display: 'table',
         borderSpacing: 0,
-        border: "1px solid transparent"
+        border: '1px solid transparent'
       },
 
       tickRow: {
-        display: "table-row"
+        display: 'table-row'
       },
 
       tickCell: (isFirstChild, isLastChild) => {
         let style = {
-          display: "table-cell",
+          display: 'table-cell',
           width: this.props.cellWidth,
           minWidth: this.props.cellWidth,
-          height: "auto",
-          borderLeft: "1px solid transparent",
-          borderRight: "1px solid darkgray"
+          height: 'auto',
+          borderLeft: '1px solid transparent',
+          borderRight: '1px solid darkgray'
         };
         if (isFirstChild) {
           style.width = this.props.leftMargin;
           style.minWidth = this.props.leftMargin;
         } else if (isLastChild) {
-          style.borderRight = "1px solid transparent";
+          style.borderRight = '1px solid transparent';
         }
         return style;
       },
       bounds: lines => {
         return {
-          position: "absolute",
+          position: 'absolute',
           left: this.props.leftMargin + 3,
           top: (this.props.cellHeight + 2) * 2,
           height: (this.props.cellHeight + 2) * lines - 2,
@@ -164,8 +166,8 @@ export default class WorkWeekGrid extends Component {
           width: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
           maxWidth: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
           zIndex: 2,
-          pointerEvents: "auto",
-          cursor: "crosshair"
+          pointerEvents: 'auto',
+          cursor: 'crosshair'
         };
       }
     };
@@ -193,12 +195,12 @@ export default class WorkWeekGrid extends Component {
       const cellCount = 1 + props.end - props.start + 1;
       const cellLunchTimeStart = props.lunchTimeStart - props.start + 1;
       const cellLunchTimeEnd = props.end - props.lunchTimeEnd + 1;
-      const day = moment(props.day).format("dd DD");
+      const day = moment(props.day).format('dd DD');
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
           <GridCell
-            key={"grid-cell#" + cell.toString()}
-            id={"grid-cell#" + cell.toString()}
+            key={'grid-cell#' + cell.toString()}
+            id={'grid-cell#' + cell.toString()}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
             lunchTime={cellLunchTimeStart <= cell && cell <= cellLunchTimeEnd}
@@ -221,7 +223,7 @@ export default class WorkWeekGrid extends Component {
         let lunchTime = props.workweek.hasLunchTime && props.workweek.lunchTime;
         return (
           <DayGrid
-            key={"day-grid#" + dayIndex}
+            key={'day-grid#' + dayIndex}
             day={timeline.day || day}
             start={props.workweek.startTime}
             end={props.workweek.endTime}
@@ -247,11 +249,11 @@ export default class WorkWeekGrid extends Component {
       for (let hour = props.start - 1; hour <= props.end; hour++) {
         cells.push(
           <ScaleCell
-            key={"grid-scale#" + hour.toString()}
+            key={'grid-scale#' + hour.toString()}
             isFirstChild={hour < props.start}
             isLastChild={!(hour < props.end)}
           >
-            {hour < props.start ? "" : hour.toString().padStart(2, "0") + ":00"}
+            {hour < props.start ? '' : hour.toString().padStart(2, '0') + ':00'}
           </ScaleCell>
         );
       }
@@ -271,7 +273,7 @@ export default class WorkWeekGrid extends Component {
       const cellCount = 1 + props.end - props.start + 1;
       for (let cell = 0; cell < cellCount; cell++) {
         cells.push(
-          <TickCell key={"grid-tick#" + cell.toString()} isFirstChild={cell === 0} isLastChild={cell === cellCount - 1}>
+          <TickCell key={'grid-tick#' + cell.toString()} isFirstChild={cell === 0} isLastChild={cell === cellCount - 1}>
             &nbsp;
           </TickCell>
         );
@@ -286,10 +288,10 @@ export default class WorkWeekGrid extends Component {
     const Works = props => {
       return props.workweek.map(work => {
         return (
-          <Bar
+          <TimeBar
             workItem={work}
             unit={[props.cellWidth + 2, props.cellHeight + 2]}
-            key={"work#" + work.id.work}
+            key={'work#' + work.id.work}
             boundsSelector={props.boundsSelector}
             dragSizeIncrement={props.quarterWidth}
             maxWidth={props.maxWidth}
@@ -299,6 +301,8 @@ export default class WorkWeekGrid extends Component {
             color={work.color}
             onWorkItemUpdate={this.onWorkItemUpdate}
             contextMenuHandler={() => props.contextMenuHandler(work)}
+            onDragStart={(e, data) => props.dragStartHandler(e, data)}
+            onDragStop={(e, data) => props.dragStopHandler(e, data)}
           />
         );
       });
@@ -321,6 +325,8 @@ export default class WorkWeekGrid extends Component {
               cellHeight={this.props.cellHeight}
               startTime={this.props.data.startTime}
               contextMenuHandler={this.onRemoveWorkItem}
+              dragStartHandler={this.onDragStart}
+              dragStopHandler={this.onDragStop}
             />
           </div>
         </div>
@@ -329,21 +335,36 @@ export default class WorkWeekGrid extends Component {
   }
 
   onWorkItemUpdate = workItem => {
-  }
+    let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
+    Log.trace(`workIndex: ${workIndex}`, 'WorkWeekGrid:onWorkItemUpdate');
+    if (workIndex !== -1) {
+      let newWorkWeek = [...this.state.workWeek];
+      newWorkWeek.splice(workIndex, 1, workItem);
+      Log.trace(newWorkWeek);
+      this.setState({
+        workWeek: newWorkWeek
+      });
+    }
+  };
 
   onAddWorkItem = e => {
-    if (e.target.id !== this.bounds.current.id) {
+    if (e.currentTarget.id !== this.bounds.current.id) {
       return;
     }
     e.preventDefault();
 
-    const {startTime} = this.props.data;
+    // workaround: when dragging, still receiving an Click event
+    if (this.dragging) {
+      this.dragging = false;
+      return;
+    }
+    const { startTime } = this.props.data;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect();
     const { clientX, clientY } = e;
     let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
     let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
-    Log.trace(`grid position : (${start}, ${dayIndex})`)
+    Log.trace(`grid position : (${start}, ${dayIndex})`);
 
     const work = Work.valueOf(this.props.projects[0].tasks[0], start, start + 1);
     WorkWeek.attach(this.props.data, dayIndex, work);
@@ -351,9 +372,19 @@ export default class WorkWeekGrid extends Component {
     this.setState(prevState => ({
       workWeek: [...prevState.workWeek, work]
     }));
-  }
+  };
 
-  onRemoveWorkItem = (workItem) => {
+  onDragStart = (e, data) => {
+    Log.trace('dragging starting...');
+    this.dragging = true;
+  };
+
+  onDragStop = (e, data) => {
+    Log.trace('dragging stopped...');
+    //    this.dragging = false;
+  };
+
+  onRemoveWorkItem = workItem => {
     Log.trace(workItem);
     Log.trace(this.state.workWeek);
     let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
@@ -364,7 +395,7 @@ export default class WorkWeekGrid extends Component {
       Log.trace(newWorkWeek);
       this.setState({
         workWeek: newWorkWeek
-      })
+      });
     }
-  }
+  };
 }

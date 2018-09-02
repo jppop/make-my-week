@@ -1,41 +1,41 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-i
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+i;
 const styles = {
   container: {
-    position: "relative",
-    fontFamily: "'Roboto', sans-serif",
+    position: 'relative',
+    fontFamily: '\'Roboto\', sans-serif',
     fontSize: 12
   },
   legend: {
-    position: "absolute",
-    color: "grey"
+    position: 'absolute',
+    color: 'grey'
   },
   tickLine: {
-    position: "absolute",
-    borderLeft: "1px solid grey",
+    position: 'absolute',
+    borderLeft: '1px solid grey',
     height: 8
   },
   bar: {
-    position: "absolute",
-    borderRight: "1px solid darkgrey"
+    position: 'absolute',
+    borderRight: '1px solid darkgrey'
   },
   grid: {
-    display: "table",
-    position: "absolute",
+    display: 'table',
+    position: 'absolute',
     borderSpacing: 1,
-    backgroundColor: "darkgray",
-    border: "1px solid darkgray"
+    backgroundColor: 'darkgray',
+    border: '1px solid darkgray'
   },
 
   gridRow: {
-    display: "table-row"
+    display: 'table-row'
   },
   gridCell: {
-    display: "table-cell",
-    backgroundColor: "white",
+    display: 'table-cell',
+    backgroundColor: 'white',
     width: 60,
-    height: "auto"
+    height: 'auto'
   }
 };
 
@@ -44,7 +44,7 @@ function Ticks(props) {
   for (let tick = props.start; tick < props.end; tick++) {
     ticks.push(
       <Tick
-        key={"tick-" + tick.toString()}
+        key={'tick-' + tick.toString()}
         tick={tick}
         x={props.x + ((tick - props.start) * (props.tickLength + 1))}
         y={props.y}
@@ -62,7 +62,7 @@ function Tick(props) {
   };
   return (
     <div style={tickStyle}>
-      <span>{props.tick.toString().padStart(2, "0") + ":00"}</span>
+      <span>{props.tick.toString().padStart(2, '0') + ':00'}</span>
     </div>
   );
 }
@@ -72,7 +72,7 @@ function TickLines(props) {
   for (let tick = props.start; tick < props.end; tick++) {
     ticks.push(
       <TickLine
-        key={"tickline-" + tick.toString()}
+        key={'tickline-' + tick.toString()}
         x={props.x + (tick - props.start) * (props.tickLength + 1)}
         y={props.y}
       />
@@ -115,7 +115,7 @@ function PlaceHolderBars(props) {
   let bars = [];
   for (let tick = props.start; tick < props.end + 1; tick++) {
     bars.push(
-      <div key={"placeholder-" + tick.toString()} style={styles.gridCell}>
+      <div key={'placeholder-' + tick.toString()} style={styles.gridCell}>
         &nbsp;
       </div>
     );

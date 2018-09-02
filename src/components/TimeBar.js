@@ -1,11 +1,66 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Rnd } from "react-rnd";
-import Color from "color";
+// @flow
+import * as React from 'react';
+import { Rnd, type RndDragCallback } from 'react-rnd';
+import Color from 'color';
+import { Work } from '../domain/WorkWeek';
 
 // see https://github.com/bokuweb/react-rnd
-export class Bar extends Component {
-  constructor(props) {
+
+type Props = {
+  /** Description of workItem */
+  workItem: Work,
+  unit: number[],
+  color: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number | string,
+  dragSizeIncrement: number,
+  maxWidth: number,
+  boundsSelector: string,
+  onWorkItemUpdate: Work => Work,
+  contextMenuHandler: Work => Work,
+  onDragStart: RndDragCallback,
+  onDragStop: RndDragCallback
+};
+
+type State = {
+  workItem: Work,
+  width: number,
+  x: number,
+  y: number
+};
+
+/**
+ * A time bar resizable and draggable.
+ *
+ * @export
+ * @class Bar
+ * @extends {React.Component<Props, State>}
+ */
+export class TimeBar extends React.Component<Props, State> {
+  static defaultProps = {
+    color: 'crimson',
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 'auto',
+    dragSizeIncrement: 1,
+    maxWidth: undefined,
+    boundsSelector: undefined,
+    onWorkItemUpdate: () => {},
+    contextMenuHandler: () => {},
+    onDragStart: () => {},
+    onDragStop: () => {}
+  };
+
+  state = {
+    workItem: this.props.workItem,
+    width: this.props.width,
+    x: this.props.x,
+    y: this.props.y
+  };
+  constructor(props: Props) {
     super(props);
     this.state = {
       workItem: props.workItem,
@@ -15,39 +70,11 @@ export class Bar extends Component {
     };
   }
 
-  static propTypes = {
-    workItem: PropTypes.object.isRequired,
-    unit: PropTypes.arrayOf(PropTypes.number).isRequired,
-    color: PropTypes.string,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    width: PropTypes.number,
-    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    dragSizeIncrement: PropTypes.number,
-    maxWidth: PropTypes.number,
-    boundsSelector: PropTypes.string,
-    onWorkItemUpdate: PropTypes.func,
-    contextMenuHandler: PropTypes.func
-  };
-
-  static defaultProps = {
-    color: "crimson",
-    x: 0,
-    y: 0,
-    width: 100,
-    height: "auto",
-    dragSizeIncrement: 1,
-    maxWidth: undefined,
-    boundsSelector: undefined,
-    onWorkItemUpdate: () => {},
-    contextMenuHandler: () => {}
-  };
-
   render() {
     let color = Color(this.props.color);
     const style = {
       backgroundColor: this.props.color,
-      color: color.isDark() ? "white" : "black"
+      color: color.isDark() ? 'white' : 'black'
     };
     return (
       <Rnd
@@ -59,30 +86,34 @@ export class Bar extends Component {
           height: this.props.height
         }}
         onResizeStop={(e, direction, ref, d, position) => {
-          this.setState({
-            width: this.state.width + d.width
-          });
+          let newState = { width: this.state.width + d.width, workItem: undefined };
+          if (this.props.onWorkItemUpdate) {
+            let newWorkItem = this.props.onWorkItemUpdate(this.state.workItem);
+            if (newWorkItem) {
+              newState.workItem = newWorkItem;
+            }
+          }
+          this.setState(newState);
         }}
         onResize={(e, direction, ref, d, position) => {
           let width = ref.offsetWidth;
           let duration = width / this.props.unit[0];
           // round duration up to the nearest quater of hour
           duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100;
-          let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
+          let workItem = this.state.workItem.clone();
           workItem.end = workItem.start + duration;
-          if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(workItem);
-            if (newWorkItem) {
-              workItem = newWorkItem;
-            }
-          }
           this.setState({
             workItem: workItem
           });
         }}
+        onDragStart={(e, data) => {
+          this.props.onDragStart(e, data);
+        }}
         onDragStop={(e, data) => {
-          let workItem = Object.assign(Object.create(Object.getPrototypeOf(this.state.workItem)), this.state.workItem);
+          this.props.onDragStop(e, data);
+          let workItem = this.state.workItem.clone();
           const duration = workItem.duration();
+          // $FlowFixMe
           workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / this.props.unit[1];
@@ -115,17 +146,14 @@ export class Bar extends Component {
         maxWidth={this.props.maxWidth}
         bounds={this.props.boundsSelector}
       >
-        <span onContextMenu={this.onContextMenu}>
-          {this.state.workItem.durationAsString()}
-        </span>
+        <span onContextMenu={this.onContextMenu}>{this.state.workItem.durationAsString()}</span>
       </Rnd>
     );
-
   }
-  onContextMenu = e => {
+  onContextMenu = (e: SyntheticMouseEvent<HTMLElement>) => {
     e.preventDefault();
     this.props.contextMenuHandler(this.state.workItem);
   };
 }
 
-export default Bar;
+export default TimeBar;

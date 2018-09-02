@@ -18,6 +18,7 @@ export default class WorkWeekGrid extends Component {
     rightMargin: PropTypes.number,
     quarterWidth: PropTypes.number
   };
+  q;
 
   static defaultProps = {
     cellHeight: 14,
@@ -360,7 +361,7 @@ export default class WorkWeekGrid extends Component {
     }
     const { startTime } = this.props.data;
 
-    const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect();
+    const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
     const { clientX, clientY } = e;
     let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
     let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));

@@ -101,8 +101,8 @@ export class Work {
     return duration;
   }
 
-  durationAsString(): string {
-    const duration = this.duration(true);
+  durationAsString(adjusted: boolean = true): string {
+    const duration = this.duration(adjusted);
     let hour = Math.trunc(duration);
     let minutes = (duration - hour) * 60;
     return hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');

@@ -77,6 +77,16 @@ export class TimeBar extends React.Component<Props, State> {
       backgroundColor: this.props.color,
       color: color.isDark() ? 'white' : 'black'
     };
+
+    const Duration = props => {
+      const duration = props.workItem.duration(true);
+      const hour = Math.trunc(duration);
+      const minutes = (duration - hour) * 60;
+      const durationAsString = hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+
+      return <span onContextMenu={props.contextMenuHandler}>{durationAsString}</span>;
+    };
+
     return (
       <Rnd
         style={style}
@@ -149,7 +159,7 @@ export class TimeBar extends React.Component<Props, State> {
         maxWidth={this.props.maxWidth}
         bounds={this.props.boundsSelector}
       >
-        <span onContextMenu={this.onContextMenu}>{this.state.workItem.durationAsString()}</span>
+        <Duration workItem={this.state.workItem} contextMenuHandler={this.onContextMenu} />
       </Rnd>
     );
   }

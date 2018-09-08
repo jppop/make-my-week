@@ -1,9 +1,9 @@
 // @flow
 
 export class Project {
-  id: string;
-  label: string;
-  tasks: Task[];
+  id: string
+  label: string
+  tasks: Task[]
 
   constructor(id: string, label: string) {
     this.id = id;
@@ -24,10 +24,10 @@ export class Project {
 }
 
 export class Task {
-  id: string;
-  label: string;
-  color: string;
-  projectId: string;
+  id: string
+  label: string
+  color: string
+  projectId: string
 
   constructor(id: string, label: string, color: string) {
     this.id = id;
@@ -41,20 +41,20 @@ type WorkId = {
   project: string,
   task: string,
   work: string
-};
+}
 type LunchTime = {
   start: number,
   end: number
-};
+}
 export class Work {
-  id: WorkId;
-  start: number;
-  end: number;
-  color: string;
-  hasLunchTime: ?boolean;
-  lunchTime: ?LunchTime;
-  dayIndex: ?number;
-  workTime: ?(number[]);
+  id: WorkId
+  start: number
+  end: number
+  color: string
+  hasLunchTime: ?boolean
+  lunchTime: ?LunchTime
+  dayIndex: ?number
+  workTime: number[]
 
   constructor(task: Task, workId: string, start: number, end: number) {
     this.id = {
@@ -65,7 +65,8 @@ export class Work {
     this.start = start;
     this.end = end;
     this.color = task.color;
-    this.hasLunchTime = true;
+    this.hasLunchTime = false;
+    this.workTime = [0, 24];
   }
   static valueOf(task: Task, start: number, end: number): Work {
     const workId = Math.random()
@@ -109,15 +110,15 @@ export class Work {
 }
 type DayWork = {
   works: Work[]
-};
+}
 export class WorkWeek {
-  day: Date;
-  hasLunchTime: boolean;
-  lunchTime: LunchTime;
-  startTime: number;
-  endTime: number;
-  daysPerWeek: number;
-  timelines: DayWork[];
+  day: Date
+  hasLunchTime: boolean
+  lunchTime: LunchTime
+  startTime: number
+  endTime: number
+  daysPerWeek: number
+  timelines: DayWork[]
 
   constructor(day: Date = new Date(), daysPerWeek: number = 5) {
     this.day = day;
@@ -140,8 +141,9 @@ export class WorkWeek {
   static addWeekWork(workWeek: WorkWeek, day: number | Date, work: Work) {
     WorkWeek.attach(workWeek, day, work);
 
-    if (work.dayIndex && work.dayIndex >= 0 && work.dayIndex < workWeek.daysPerWeek) {
-      workWeek.timelines[work.dayIndex].works.push(work);
+    let dayIndex = work.dayIndex || 0;
+    if (0 <= dayIndex && dayIndex < workWeek.daysPerWeek) {
+      workWeek.timelines[dayIndex].works.push(work);
     }
   }
 

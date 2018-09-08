@@ -375,14 +375,14 @@ export default class WorkWeekGrid extends Component {
     }));
   };
 
-  onDragStart = (e, data) => {
-    Log.trace('dragging starting...');
+  onDragStart = (e, workItem) => {
+    Log.trace('dragging starting...', 'WorkWeekGrid::onDragStart');
     this.dragging = true;
   };
 
-  onDragStop = (e, data) => {
-    Log.trace('dragging stopped...');
-    //    this.dragging = false;
+  onDragStop = (e, workItem) => {
+    Log.trace('dragging stopped...', 'WorkWeekGrid::onDragStop');
+    this.dragging = false;
   };
 
   onRemoveWorkItem = workItem => {

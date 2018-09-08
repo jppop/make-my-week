@@ -62,7 +62,7 @@ function Fixture({ workItem, onWorkItemUpdate, contextMenuHandler, dragStartHand
           width={(settings.cellWidth + 2) * workItem.duration() - 1}
           color={workItem.color}
           onWorkItemUpdate={onWorkItemUpdate}
-          contextMenuHandler={() => contextMenuHandler(work)}
+          contextMenuHandler={workItem => contextMenuHandler(workItem)}
           onDragStart={(e, data) => dragStartHandler(e, data)}
           onDragStop={(e, data) => dragStopHandler(e, data)}
         />
@@ -81,6 +81,7 @@ describe('rendering', () => {
         workItem: workItem
       })
     );
+    // console.log(wrapper.debug());
     expect(wrapper.find(TimeBar)).toHaveLength(1);
     const barNode = wrapper.find(TimeBar).first();
     expect(barNode.props().color).toBe(workItem.color);
@@ -92,5 +93,48 @@ describe('rendering', () => {
         .first()
         .text()
     ).toBe(workItem.durationAsString());
+  });
+});
+describe('event', () => {
+  test('bar call drag callbacks', () => {
+    let task = project.getTask('T01');
+    expect(task).not.toBeNull();
+    let workItem = Work.valueOf(task, 9, 18);
+    const dragStartSpy = jest.fn();
+    const dragStopSpy = jest.fn();
+    const onWorkItemUpdateSpy = jest.fn();
+    const wrapper = mount(
+      Fixture({
+        workItem: workItem,
+        dragStartHandler: dragStartSpy,
+        dragStopHandler: dragStopSpy,
+        onWorkItemUpdate: onWorkItemUpdateSpy
+      })
+    );
+    expect(wrapper.find(TimeBar)).toHaveLength(1);
+    const barNode = wrapper.find(TimeBar).first();
+    barNode.simulate('mousedown', { clientX: 0, clientY: 0 });
+    barNode.simulate('mouseup', { clientX: 1, clientY: 1 });
+    expect(dragStartSpy).toBeCalled();
+    expect(dragStopSpy).toBeCalled();
+    expect(onWorkItemUpdateSpy).toBeCalled();
+  });
+  test('bar call contextmenu callbacks', () => {
+    let task = project.getTask('T01');
+    expect(task).not.toBeNull();
+    let workItem = Work.valueOf(task, 9, 18);
+    const contextMenuHandlerSpy = jest.fn();
+    const wrapper = mount(
+      Fixture({
+        workItem: workItem,
+        contextMenuHandler: contextMenuHandlerSpy
+      })
+    );
+    expect(wrapper.find(TimeBar)).toHaveLength(1);
+    const barNode = wrapper.find(TimeBar).first();
+    const spanNodes = barNode.find('span');
+    expect(spanNodes).toHaveLength(2);
+    spanNodes.first().simulate('contextmenu', { clientX: 0, clientY: 0 });
+    expect(contextMenuHandlerSpy).toBeCalled();
   });
 });

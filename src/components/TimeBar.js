@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
-import { Rnd, type RndDragCallback } from 'react-rnd';
+import { Rnd } from 'react-rnd';
 import Color from 'color';
 import { Work } from '../domain/WorkWeek';
+import Log from '../Log';
 
 // see https://github.com/bokuweb/react-rnd
 
@@ -20,16 +21,16 @@ type Props = {
   boundsSelector: string,
   onWorkItemUpdate: Work => Work,
   contextMenuHandler: Work => Work,
-  onDragStart: RndDragCallback,
-  onDragStop: RndDragCallback
-};
+  onDragStart: (Event, Work) => void,
+  onDragStop: (Event, Work) => void
+}
 
 type State = {
   workItem: Work,
   width: number,
   x: number,
   y: number
-};
+}
 
 /**
  * A time bar resizable and draggable.
@@ -52,14 +53,14 @@ export class TimeBar extends React.Component<Props, State> {
     contextMenuHandler: () => {},
     onDragStart: () => {},
     onDragStop: () => {}
-  };
+  }
 
   state = {
     workItem: this.props.workItem,
     width: this.props.width,
     x: this.props.x,
     y: this.props.y
-  };
+  }
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -107,16 +108,18 @@ export class TimeBar extends React.Component<Props, State> {
           });
         }}
         onDragStart={(e, data) => {
-          this.props.onDragStart(e, data);
+          Log.trace({ event: e, data: data }, 'TimeBar::OnDragStart');
+          const workItem = this.state.workItem.clone();
+          this.props.onDragStart(e, workItem);
         }}
         onDragStop={(e, data) => {
-          this.props.onDragStop(e, data);
+          Log.trace({ event: e, data: data }, 'TimeBar::OnDragStop');
           let workItem = this.state.workItem.clone();
           const duration = workItem.duration();
-          // $FlowFixMe
           workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / this.props.unit[1];
+          this.props.onDragStop(e, workItem);
           if (this.props.onWorkItemUpdate) {
             let newWorkItem = this.props.onWorkItemUpdate(workItem);
             if (newWorkItem) {
@@ -153,7 +156,7 @@ export class TimeBar extends React.Component<Props, State> {
   onContextMenu = (e: SyntheticMouseEvent<HTMLElement>) => {
     e.preventDefault();
     this.props.contextMenuHandler(this.state.workItem);
-  };
+  }
 }
 
 export default TimeBar;

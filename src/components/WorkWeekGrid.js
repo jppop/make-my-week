@@ -323,7 +323,7 @@ export default class WorkWeekGrid extends Component {
         <Scale start={settings.startTime} end={settings.endTime} />
         <Tick start={settings.startTime} end={settings.endTime} />
         <Grid workweek={this.props.data} />
-        <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this.onAddWorkItem}>
+        <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this._onAddWorkItem}>
           <div>
             <Works
               workweek={this.state.workWeek}
@@ -333,8 +333,8 @@ export default class WorkWeekGrid extends Component {
               cellHeight={this.props.cellHeight}
               startTime={settings.startTime}
               contextMenuHandler={this.onRemoveWorkItem}
-              dragStartHandler={this.onDragStart}
-              dragStopHandler={this.onDragStop}
+              dragStartHandler={this._onDragStart}
+              dragStopHandler={this._onDragStop}
             />
             <TaskSearch
               tasks={this.props.tasks}
@@ -375,7 +375,7 @@ export default class WorkWeekGrid extends Component {
     dayIndex: NaN,
   }
 
-  onAddWorkItem = e => {
+  _onAddWorkItem = e => {
     if (e.currentTarget.id !== this.bounds.current.id) {
       return;
     }
@@ -419,12 +419,12 @@ export default class WorkWeekGrid extends Component {
 
  
   }
-  onDragStart = (e, workItem) => {
+  _onDragStart = (e, workItem) => {
     Log.trace('dragging starting...', 'WorkWeekGrid::onDragStart');
     this.dragging = true;
   }
 
-  onDragStop = (e, workItem) => {
+  _onDragStop = (e, workItem) => {
     Log.trace('dragging stopped...', 'WorkWeekGrid::onDragStop');
     this.dragging = false;
   }

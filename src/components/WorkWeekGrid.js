@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import TimeBar from './TimeBar';
+import TaskSearch from './TaskSearch';
 import moment from 'moment';
 import { WorkWeek, Work } from '../domain/WorkWeek';
 import Log from '../Log';
@@ -11,13 +12,13 @@ const QUATER_WIDTH = 16;
 export default class WorkWeekGrid extends Component {
   static propTypes = {
     data: PropTypes.object.isRequired,
-    projects: PropTypes.array.isRequired,
+    tasks: PropTypes.array.isRequired,
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
     rightMargin: PropTypes.number,
-    quarterWidth: PropTypes.number,
-  };
+    quarterWidth: PropTypes.number
+  }
 
   static defaultProps = {
     cellHeight: 14,
@@ -25,7 +26,7 @@ export default class WorkWeekGrid extends Component {
     quarterWidth: QUATER_WIDTH,
     leftMargin: 40,
     rightMargin: 20
-  };
+  }
 
   constructor(props) {
     super(props);
@@ -37,7 +38,9 @@ export default class WorkWeekGrid extends Component {
       return timeline.works.map(work => workWeek.push(work));
     });
     this.state = {
-      workWeek: workWeek
+      workWeek: workWeek,
+      showTaskSearch: false,
+      taskSearchPosition: {x: 0, y: 0}
     };
 
     this.bounds = React.createRef();
@@ -328,6 +331,19 @@ export default class WorkWeekGrid extends Component {
               dragStartHandler={this.onDragStart}
               dragStopHandler={this.onDragStop}
             />
+            <TaskSearch
+              tasks={this.props.tasks}
+              close={() => {
+                this._closeTaskSelector();
+              }}
+              onSelectTask={task => {
+                Log.trace(task);
+                this.setState({ showTaskSearch: false });
+              }}
+              showing={this.state.showTaskSearch}
+              x={this.state.taskSearchPosition.x}
+              y={this.state.taskSearchPosition.y}
+            />
           </div>
         </div>
       </div>
@@ -345,7 +361,7 @@ export default class WorkWeekGrid extends Component {
         workWeek: newWorkWeek
       });
     }
-  };
+  }
 
   onAddWorkItem = e => {
     if (e.currentTarget.id !== this.bounds.current.id) {
@@ -353,40 +369,41 @@ export default class WorkWeekGrid extends Component {
     }
     e.preventDefault();
 
-    // workaround: when dragging, still receiving an Click event
+    // workaround: when dragging, still receiving a click event
     if (this.dragging) {
       this.dragging = false;
       return;
     }
-    const { startTime } = this.props.data;
+    const {offsetX, offsetY} = e.nativeEvent;
+    Log.trace(`position: (${offsetX}, ${offsetY})`, 'WorkWeekGrid::onAddWorkItem');
+    this._openTaskSelector(offsetX, offsetY);
+    // const { startTime } = this.props.data;
 
-    const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
-    const { clientX, clientY } = e;
-    let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
-    let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
-    Log.trace(`grid position : (${start}, ${dayIndex})`);
+    // const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
+    // const { clientX, clientY } = e;
+    // let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
+    // let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
+    // Log.trace(`grid position : (${start}, ${dayIndex})`);
 
-    const work = Work.valueOf(this.props.projects[0].tasks[0], start, start + 1);
-    WorkWeek.attach(this.props.data, dayIndex, work);
+    // const work = Work.valueOf(this.props.projects[0].tasks[0], start, start + 1);
+    // WorkWeek.attach(this.props.data, dayIndex, work);
 
-    this.setState(prevState => ({
-      workWeek: [...prevState.workWeek, work]
-    }));
-  };
+    // this.setState(prevState => ({
+    //   workWeek: [...prevState.workWeek, work]
+    // }));
+  }
 
   onDragStart = (e, workItem) => {
     Log.trace('dragging starting...', 'WorkWeekGrid::onDragStart');
     this.dragging = true;
-  };
+  }
 
   onDragStop = (e, workItem) => {
     Log.trace('dragging stopped...', 'WorkWeekGrid::onDragStop');
     this.dragging = false;
-  };
+  }
 
   onRemoveWorkItem = workItem => {
-    Log.trace(workItem);
-    Log.trace(this.state.workWeek);
     let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
     Log.trace(`workIndex: ${workIndex}`);
     if (workIndex !== -1) {
@@ -397,5 +414,14 @@ export default class WorkWeekGrid extends Component {
         workWeek: newWorkWeek
       });
     }
-  };
+  }
+  _closeTaskSelector = () => {
+    this.setState({ showTaskSearch: false });
+  }
+  _openTaskSelector = (x, y) => {
+    this.setState({
+      showTaskSearch: true,
+      taskSearchPosition: {x: x, y: y}
+    });
+  }
 }

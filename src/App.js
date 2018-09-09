@@ -36,7 +36,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      showTaskSearch: true
+      showTaskSearch: false
     };
   }
   closeTaskSelector = () => {
@@ -48,7 +48,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <WorkWeekGrid data={workWeek} projects={projects} />
+        <WorkWeekGrid data={workWeek} tasks={allTasks} />
         <div style={{ textAlign: 'left' }}>
           {this.state.showTaskSearch || <button onClick={() => this.openTaskSelector()}>Select task</button>}
           <TaskSearch

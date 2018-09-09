@@ -28,7 +28,9 @@ const styles = {
       position: 'relative',
       fontSize: 11,
       left: x,
-      top: y
+      top: y,
+      zIndex: 10,
+      cursor: 'auto'
     };
   },
   taskContainer: { width: 350, height: selectorHeight - 40, overflow: 'auto' },
@@ -49,13 +51,15 @@ export default class TaskSearch extends React.Component<Props, State> {
     this.props.close();
     this.setState({ xHovered: false, filter: '' });
   }
+
   _onKeyPress = (e: KeyboardEvent) => {
     Log.trace('key pressed', 'TaskSearch::onKeyPress');
     if (e.keyCode === 27) {
       this._close();
     }
   }
-  _onSelectTask = (task: Task) => {
+  _onSelectTask = (event: SyntheticMouseEvent<HTMLElement>, task: Task) => {
+    // event.stopPropagation();
     if (this.props.onSelectTask) {
       this.props.onSelectTask(task);
     }
@@ -86,7 +90,7 @@ export default class TaskSearch extends React.Component<Props, State> {
     const searchInput = (
       <div>
         <input
-          style={{ margin: 10, width: '90%', borderRadius: 5, border: '1px solid #E8E8E8' }}
+          style={{ margin: 10, width: '85%', borderRadius: 5, border: '1px solid #E8E8E8' }}
           type="text"
           placeholder="Search"
           value={this.state.filter}
@@ -125,14 +129,14 @@ export default class TaskSearch extends React.Component<Props, State> {
     const tasks = shownTasks.map(task => {
       return (
         <li key={task.projectId + ':' + task.id}>
-          <span style={{ cursor: 'pointer' }} onClick={() => this._onSelectTask(task)}>
+          <span style={{ cursor: 'pointer' }} onClick={e => this._onSelectTask(e, task)}>
             {task.projectId} - {task.label}
           </span>
         </li>
       );
     });
     return (
-      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }}>
+      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }} onClick={e => e.stopPropagation()}>
         {searchInput}
         {closeButton}
         <div style={styles.taskContainer}>

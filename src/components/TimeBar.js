@@ -112,18 +112,18 @@ export class TimeBar extends React.Component<Props, State> {
           });
         }}
         onDragStart={(e, data) => {
+          e.stopPropagation();
           Log.trace({ event: e, data: data }, 'TimeBar::OnDragStart');
           const workItem = this.state.workItem.clone();
-          this.props.onDragStart(e, workItem);
         }}
         onDragStop={(e, data) => {
+          e.stopPropagation();
           Log.trace({ event: e, data: data }, 'TimeBar::OnDragStop');
           let workItem = this.state.workItem.clone();
           const duration = workItem.duration();
           workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / this.props.unit[1];
-          this.props.onDragStop(e, workItem);
           if (this.props.onWorkItemUpdate) {
             let newWorkItem = this.props.onWorkItemUpdate(workItem);
             if (newWorkItem) {

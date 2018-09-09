@@ -31,8 +31,6 @@ export default class WorkWeekGrid extends Component {
   constructor(props) {
     super(props);
 
-    this.dragging = false;
-
     const workWeek = [];
     props.data.timelines.forEach(timeline => {
       return timeline.works.map(work => workWeek.push(work));
@@ -309,8 +307,6 @@ export default class WorkWeekGrid extends Component {
             color={work.color}
             onWorkItemUpdate={this.onWorkItemUpdate}
             contextMenuHandler={() => props.contextMenuHandler(work)}
-            onDragStart={(e, data) => props.dragStartHandler(e, data)}
-            onDragStop={(e, data) => props.dragStopHandler(e, data)}
           />
         );
       });
@@ -333,8 +329,6 @@ export default class WorkWeekGrid extends Component {
               cellHeight={this.props.cellHeight}
               startTime={settings.startTime}
               contextMenuHandler={this.onRemoveWorkItem}
-              dragStartHandler={this._onDragStart}
-              dragStopHandler={this._onDragStop}
             />
             <TaskSearch
               tasks={this.props.tasks}
@@ -379,13 +373,8 @@ export default class WorkWeekGrid extends Component {
     if (e.currentTarget.id !== this.bounds.current.id) {
       return;
     }
-    e.preventDefault();
+    e.stopPropagation();
 
-    // workaround: when dragging, still receiving a click event
-    if (this.dragging) {
-      this.dragging = false;
-      return;
-    }
     const { offsetX, offsetY } = e.nativeEvent;
     Log.trace(`position: (${offsetX}, ${offsetY})`, 'WorkWeekGrid::onAddWorkItem');
 
@@ -419,16 +408,6 @@ export default class WorkWeekGrid extends Component {
 
  
   }
-  _onDragStart = (e, workItem) => {
-    Log.trace('dragging starting...', 'WorkWeekGrid::onDragStart');
-    this.dragging = true;
-  }
-
-  _onDragStop = (e, workItem) => {
-    Log.trace('dragging stopped...', 'WorkWeekGrid::onDragStop');
-    this.dragging = false;
-  }
-
   onRemoveWorkItem = workItem => {
     let workIndex = this.state.workWeek.findIndex(w => w.id.work === workItem.id.work);
     Log.trace(`workIndex: ${workIndex}`);

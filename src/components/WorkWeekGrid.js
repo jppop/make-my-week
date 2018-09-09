@@ -16,9 +16,8 @@ export default class WorkWeekGrid extends Component {
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
     rightMargin: PropTypes.number,
-    quarterWidth: PropTypes.number
+    quarterWidth: PropTypes.number,
   };
-  q;
 
   static defaultProps = {
     cellHeight: 14,

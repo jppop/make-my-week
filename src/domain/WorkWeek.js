@@ -111,23 +111,36 @@ export class Work {
 type DayWork = {
   works: Work[]
 }
+
+type WorkWeekOption = {
+  daysPerWeek: number,
+  hasLunchTime: boolean,
+  lunchTime: LunchTime,
+  startTime: number,
+  endTime: number,
+  defaultWorkDuration: number
+}
 export class WorkWeek {
   day: Date
-  hasLunchTime: boolean
-  lunchTime: LunchTime
-  startTime: number
-  endTime: number
-  daysPerWeek: number
+  settings: WorkWeekOption
   timelines: DayWork[]
 
-  constructor(day: Date = new Date(), daysPerWeek: number = 5) {
+  constructor(day: Date = new Date(), options?: any) {
     this.day = day;
-    this.hasLunchTime = true;
-    this.lunchTime = { start: 12, end: 14 };
-    this.startTime = 8;
-    this.endTime = 19;
-    this.daysPerWeek = daysPerWeek;
-    this.timelines = Array(this.daysPerWeek)
+    const defaultOptions: WorkWeekOption = {
+      daysPerWeek: 5,
+      hasLunchTime: true,
+      lunchTime: { start: 13, end: 14 },
+      startTime: 8,
+      endTime: 19,
+      defaultWorkDuration: 4
+    };
+    if (options) {
+      this.settings = Object.assign(defaultOptions, ...options);
+    } else {
+      this.settings = Object.assign(defaultOptions);
+    }
+    this.timelines = Array(this.settings.daysPerWeek)
       .fill(null)
       .map(() => {
         return { works: [] };
@@ -142,7 +155,7 @@ export class WorkWeek {
     WorkWeek.attach(workWeek, day, work);
 
     let dayIndex = work.dayIndex || 0;
-    if (0 <= dayIndex && dayIndex < workWeek.daysPerWeek) {
+    if (0 <= dayIndex && dayIndex < workWeek.settings.daysPerWeek) {
       workWeek.timelines[dayIndex].works.push(work);
     }
   }
@@ -154,7 +167,7 @@ export class WorkWeek {
     } else {
       dayIndex = day;
     }
-    const { hasLunchTime, lunchTime, startTime, endTime } = workWeek;
+    const { hasLunchTime, lunchTime, startTime, endTime } = workWeek.settings;
     work.hasLunchTime = hasLunchTime;
     work.lunchTime = lunchTime;
     work.workTime = [startTime, endTime];

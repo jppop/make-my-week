@@ -160,14 +160,15 @@ export default class WorkWeekGrid extends Component {
         return style;
       },
       bounds: lines => {
+        const {settings} = this.props.data;
         return {
           position: 'absolute',
           left: this.props.leftMargin + 3,
           top: (this.props.cellHeight + 2) * 2,
           height: (this.props.cellHeight + 2) * lines - 2,
           maxHeight: (this.props.cellHeight + 2) * lines - 2,
-          width: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
-          maxWidth: (this.props.cellWidth + 2) * (this.props.data.endTime - this.props.data.startTime) - 1,
+          width: (this.props.cellWidth + 2) * (settings.endTime - settings.startTime) - 1,
+          maxWidth: (this.props.cellWidth + 2) * (settings.endTime - settings.startTime) - 1,
           zIndex: 2,
           pointerEvents: 'auto',
           cursor: 'crosshair'
@@ -185,6 +186,10 @@ export default class WorkWeekGrid extends Component {
   }
 
   render() {
+
+    const {settings} = this.props.data;
+    Log.trace(settings, 'WorkWeekGrid::render');
+
     const GridCell = props => {
       return (
         <div id={props.id} style={this.styles.gridCell(props.isFirstChild, props.isLastChild, props.lunchTime)}>
@@ -220,20 +225,20 @@ export default class WorkWeekGrid extends Component {
     };
 
     const Grid = props => {
+      const {hasLunchTime, lunchTime, startTime, endTime} = props.workweek.settings;
       return props.workweek.timelines.map((timeline, dayIndex) => {
         let day = new Date(props.workweek.day);
         day.setDate(props.workweek.day.getDate() + dayIndex);
-        let lunchTime = props.workweek.hasLunchTime && props.workweek.lunchTime;
         return (
           <DayGrid
             key={'day-grid#' + dayIndex}
             day={timeline.day || day}
-            start={props.workweek.startTime}
-            end={props.workweek.endTime}
+            start={startTime}
+            end={endTime}
             isFirstChild={dayIndex === 0}
             lunchTime={lunchTime}
-            lunchTimeStart={lunchTime ? props.workweek.lunchTime.start : Number.MAX_VALUE}
-            lunchTimeEnd={lunchTime ? props.workweek.lunchTime.end : -1}
+            lunchTimeStart={hasLunchTime ? lunchTime.start : Number.MAX_VALUE}
+            lunchTimeEnd={hasLunchTime ? lunchTime.end : -1}
           />
         );
       });
@@ -315,8 +320,8 @@ export default class WorkWeekGrid extends Component {
 
     return (
       <div style={this.styles.container}>
-        <Scale start={this.props.data.startTime} end={this.props.data.endTime} />
-        <Tick start={this.props.data.startTime} end={this.props.data.endTime} />
+        <Scale start={settings.startTime} end={settings.endTime} />
+        <Tick start={settings.startTime} end={settings.endTime} />
         <Grid workweek={this.props.data} />
         <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this.onAddWorkItem}>
           <div>
@@ -326,7 +331,7 @@ export default class WorkWeekGrid extends Component {
               quarterWidth={this.props.quarterWidth}
               cellWidth={this.props.cellWidth}
               cellHeight={this.props.cellHeight}
-              startTime={this.props.data.startTime}
+              startTime={settings.startTime}
               contextMenuHandler={this.onRemoveWorkItem}
               dragStartHandler={this.onDragStart}
               dragStopHandler={this.onDragStop}
@@ -366,6 +371,7 @@ export default class WorkWeekGrid extends Component {
 
   newWorkItem = {
     startTime: NaN,
+    endTime: NaN,
     dayIndex: NaN,
   }
 
@@ -383,7 +389,7 @@ export default class WorkWeekGrid extends Component {
     const { offsetX, offsetY } = e.nativeEvent;
     Log.trace(`position: (${offsetX}, ${offsetY})`, 'WorkWeekGrid::onAddWorkItem');
 
-    const { startTime } = this.props.data;
+    const { startTime, defaultWorkDuration } = this.props.data.settings;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
     const { clientX, clientY } = e;
@@ -394,6 +400,7 @@ export default class WorkWeekGrid extends Component {
     // keep around start time
     this.newWorkItem = {
       startTime: start,
+      endTime: start + defaultWorkDuration,
       dayIndex: dayIndex
     };
     // Log.trace(`grid position : (${start}, ${dayIndex})`);
@@ -403,7 +410,7 @@ export default class WorkWeekGrid extends Component {
   }
 
   _addWorkItem = (task) => {
-    const work = Work.valueOf(task, this.newWorkItem.startTime, this.newWorkItem.startTime + 1);
+    const work = Work.valueOf(task, this.newWorkItem.startTime, this.newWorkItem.endTime);
     WorkWeek.attach(this.props.data, this.newWorkItem.dayIndex, work);
 
     this.setState(prevState => ({

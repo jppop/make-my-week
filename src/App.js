@@ -33,12 +33,37 @@ Log.trace(workWeek);
 Log.trace(allTasks);
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      showTaskSearch: true
+    };
+  }
+  closeTaskSelector = () => {
+    this.setState({ showTaskSearch: false });
+  }
+  openTaskSelector = () => {
+    this.setState({ showTaskSearch: true });
+  }
   render() {
     return (
       <div className="App">
         <WorkWeekGrid data={workWeek} projects={projects} />
-        <div>
-          <TaskSearch tasks={allTasks} close={() => {}} showing={true} x={20} y={20} />
+        <div style={{ textAlign: 'left' }}>
+          {this.state.showTaskSearch || <button onClick={() => this.openTaskSelector()}>Select task</button>}
+          <TaskSearch
+            tasks={allTasks}
+            close={() => {
+              this.closeTaskSelector();
+            }}
+            onSelectTask={task => {
+              Log.trace(task);
+              this.setState({ showTaskSearch: false });
+            }}
+            showing={this.state.showTaskSearch}
+            x={20}
+            y={20}
+          />
         </div>
       </div>
     );

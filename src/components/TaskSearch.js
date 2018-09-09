@@ -8,7 +8,8 @@ type Props = {
   x: number,
   y: number,
   showing: boolean,
-  close: () => void
+  close: () => void,
+  onSelectTask?: Task => void
 }
 
 type State = {
@@ -16,17 +17,22 @@ type State = {
   xHovered: boolean
 }
 
-const selectorStyle = (x, y) => {
-  return {
-    boxShadow: '0 6px 8px 0 rgba(0, 0, 0, 0.24)',
-    backgroundColor: '#fff',
-    width: '350px',
-    height: '220px',
-    position: 'relative',
-    fontSize: 11,
-    left: x,
-    top: y
-  };
+const selectorHeight = 100;
+const styles = {
+  selectorStyle: (x, y) => {
+    return {
+      boxShadow: '0 6px 8px 0 rgba(0, 0, 0, 0.24)',
+      backgroundColor: '#fff',
+      width: 350,
+      height: selectorHeight,
+      position: 'relative',
+      fontSize: 11,
+      left: x,
+      top: y
+    };
+  },
+  taskContainer: { width: 350, height: selectorHeight - 40, overflow: 'auto' },
+  tasks: { textAlign: 'left', margin: 0, paddingLeft: 20, listStyle: 'none' }
 };
 
 export default class TaskSearch extends React.Component<Props, State> {
@@ -34,19 +40,45 @@ export default class TaskSearch extends React.Component<Props, State> {
     super(props);
     this.state = {
       filter: '',
-      xHovered: false
+      xHovered: false,
+      selectedTask: null
     };
   }
 
+  _close = () => {
+    this.props.close();
+    this.setState({ xHovered: false, filter: '' });
+  }
+  _onKeyPress = (e: KeyboardEvent) => {
+    Log.trace('key pressed', 'TaskSearch::onKeyPress');
+    if (e.keyCode === 27) {
+      this._close();
+    }
+  }
+  _onSelectTask = (task: Task) => {
+    if (this.props.onSelectTask) {
+      this.props.onSelectTask(task);
+    }
+  }
+  componentWillUnmount() {
+    if (!this.props.showing) {
+      document.removeEventListener('keydown', this._onKeyPress, false);
+    }
+  }
   render() {
-    const { showing, x, y, close } = this.props;
+    const { showing, x, y } = this.props;
+    if (showing) {
+      document.addEventListener('keydown', this._onKeyPress, false);
+    } else {
+      document.removeEventListener('keydown', this._onKeyPress, false);
+    }
     let xStyle = {
       color: '#E8E8E8',
       fontSize: '20px',
       cursor: 'pointer',
       float: 'right',
       marginTop: '-32px',
-      marginRight: '2px'
+      marginRight: '5px'
     };
     if (this.state.xHovered) {
       xStyle.color = '#4fb0fc';
@@ -54,7 +86,7 @@ export default class TaskSearch extends React.Component<Props, State> {
     const searchInput = (
       <div>
         <input
-          style={{ margin: '10px', width: '85%', borderRadius: '5px', border: '1px solid #E8E8E8' }}
+          style={{ margin: 10, width: '90%', borderRadius: 5, border: '1px solid #E8E8E8' }}
           type="text"
           placeholder="Search"
           value={this.state.filter}
@@ -65,10 +97,7 @@ export default class TaskSearch extends React.Component<Props, State> {
     const closeButton = (
       <span
         style={xStyle}
-        onClick={() => {
-          this.setState({ xHovered: false });
-          close();
-        }}
+        onClick={this._close}
         onMouseEnter={() => this.setState({ xHovered: true })}
         onMouseLeave={() => this.setState({ xHovered: false })}
       >
@@ -81,7 +110,7 @@ export default class TaskSearch extends React.Component<Props, State> {
       if (words.length > 1) {
         // search on project and task label
         const projectFilter = words[0];
-        const taskFilter = filter.substring(filter.indexOf(words[1])).trim();
+        const taskFilter = filter.substring(filter.indexOf(projectFilter) + projectFilter.length).trim();
         Log.trace(`project filter: ${projectFilter}, task filter: ${taskFilter}`, 'TaskSearch::filter');
         return (
           task.label.toLowerCase().indexOf(taskFilter) !== -1 && task.projectId.toLowerCase().startsWith(projectFilter)
@@ -92,19 +121,22 @@ export default class TaskSearch extends React.Component<Props, State> {
         task.label.toLowerCase().indexOf(anyFilter) !== -1 || task.projectId.toLowerCase().indexOf(anyFilter) !== -1
       );
     });
+
     const tasks = shownTasks.map(task => {
       return (
         <li key={task.projectId + ':' + task.id}>
-          {task.projectId} - {task.label}
+          <span style={{ cursor: 'pointer' }} onClick={() => this._onSelectTask(task)}>
+            {task.projectId} - {task.label}
+          </span>
         </li>
       );
     });
     return (
-      <div style={showing ? selectorStyle(x, y) : { display: 'none' }}>
+      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }}>
         {searchInput}
         {closeButton}
-        <div style={{ width: '350', height: '180px', overflow: 'auto' }}>
-          <ul style={{ textAlign: 'left', margin: 0, height: 180 }}>{tasks}</ul>
+        <div style={styles.taskContainer}>
+          <ul style={styles.tasks}>{tasks}</ul>
         </div>
       </div>
     );

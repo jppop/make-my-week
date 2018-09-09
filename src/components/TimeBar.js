@@ -114,7 +114,6 @@ export class TimeBar extends React.Component<Props, State> {
         onDragStart={(e, data) => {
           e.stopPropagation();
           Log.trace({ event: e, data: data }, 'TimeBar::OnDragStart');
-          const workItem = this.state.workItem.clone();
         }}
         onDragStop={(e, data) => {
           e.stopPropagation();

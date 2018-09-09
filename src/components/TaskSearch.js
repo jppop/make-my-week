@@ -38,6 +38,8 @@ const styles = {
 };
 
 export default class TaskSearch extends React.Component<Props, State> {
+  textInput: ?HTMLInputElement
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -64,6 +66,15 @@ export default class TaskSearch extends React.Component<Props, State> {
       this.props.onSelectTask(task);
     }
   }
+
+  componentDidUpdate() {
+    Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
+
+    if (this.textInput) {
+      this.textInput.focus();
+    }
+  }
+
   componentWillUnmount() {
     if (!this.props.showing) {
       document.removeEventListener('keydown', this._onKeyPress, false);
@@ -73,6 +84,7 @@ export default class TaskSearch extends React.Component<Props, State> {
     const { showing, x, y } = this.props;
     if (showing) {
       document.addEventListener('keydown', this._onKeyPress, false);
+      Log.trace(this.textInput, 'TaskSearch::render');
     } else {
       document.removeEventListener('keydown', this._onKeyPress, false);
     }
@@ -95,6 +107,9 @@ export default class TaskSearch extends React.Component<Props, State> {
           placeholder="Search"
           value={this.state.filter}
           onChange={e => this.setState({ filter: e.target.value })}
+          ref={input => {
+            this.textInput = input;
+          }}
         />
       </div>
     );

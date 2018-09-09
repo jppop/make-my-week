@@ -55,12 +55,6 @@ export class TimeBar extends React.Component<Props, State> {
     onDragStop: () => {}
   }
 
-  state = {
-    workItem: this.props.workItem,
-    width: this.props.width,
-    x: this.props.x,
-    y: this.props.y
-  }
   constructor(props: Props) {
     super(props);
     this.state = {

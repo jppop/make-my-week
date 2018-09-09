@@ -112,7 +112,7 @@ type DayWork = {
   works: Work[]
 }
 
-type WorkWeekOption = {
+type WeekWorkOption = {
   daysPerWeek: number,
   hasLunchTime: boolean,
   lunchTime: LunchTime,
@@ -120,14 +120,14 @@ type WorkWeekOption = {
   endTime: number,
   defaultWorkDuration: number
 }
-export class WorkWeek {
+export class WeekWork {
   day: Date
-  settings: WorkWeekOption
+  settings: WeekWorkOption
   timelines: DayWork[]
 
   constructor(day: Date = new Date(), options?: any) {
     this.day = day;
-    const defaultOptions: WorkWeekOption = {
+    const defaultOptions: WeekWorkOption = {
       daysPerWeek: 5,
       hasLunchTime: true,
       lunchTime: { start: 13, end: 14 },
@@ -147,27 +147,28 @@ export class WorkWeek {
       });
   }
 
-  addWork(day: number | Date, work: Work) {
-    WorkWeek.addWeekWork(this, day, work);
+  addWork(day: number | Date, work: Work): Work {
+    return WeekWork.addWeekWork(this, day, work);
   }
 
-  static addWeekWork(workWeek: WorkWeek, day: number | Date, work: Work) {
-    WorkWeek.attach(workWeek, day, work);
+  static addWeekWork(weekWork: WeekWork, day: number | Date, work: Work): Work {
+    WeekWork.attach(weekWork, day, work);
 
     let dayIndex = work.dayIndex || 0;
-    if (0 <= dayIndex && dayIndex < workWeek.settings.daysPerWeek) {
-      workWeek.timelines[dayIndex].works.push(work);
+    if (0 <= dayIndex && dayIndex < weekWork.settings.daysPerWeek) {
+      weekWork.timelines[dayIndex].works.push(work);
     }
+    return work;
   }
 
-  static attach(workWeek: WorkWeek, day: number | Date, work: Work) {
+  static attach(weekWork: WeekWork, day: number | Date, work: Work) {
     let dayIndex: number;
     if (day instanceof Date) {
       dayIndex = day.getDay() - 1;
     } else {
       dayIndex = day;
     }
-    const { hasLunchTime, lunchTime, startTime, endTime } = workWeek.settings;
+    const { hasLunchTime, lunchTime, startTime, endTime } = weekWork.settings;
     work.hasLunchTime = hasLunchTime;
     work.lunchTime = lunchTime;
     work.workTime = [startTime, endTime];

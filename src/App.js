@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
-import WorkWeekGrid from './components/WorkWeekGrid';
+import WeekWorkGrid from './components/WeekWorkGrid';
 import TaskSearch from './components/TaskSearch';
-import { WorkWeek, Work, Task, Project } from './domain/WorkWeek';
+import { WeekWork, Work, Task, Project } from './domain/WeekWork';
 import Log from './Log';
 import faker from 'faker';
 
@@ -17,19 +17,19 @@ for (let i = 0; i < 5; i++) {
   projects.push(project);
 }
 
-const workWeek = new WorkWeek(new Date(2018, 7, 20));
-workWeek.addWork(0, Work.valueOf(projects[0].tasks[0], 8, 9));
-workWeek.addWork(0, Work.valueOf(projects[0].tasks[1], 9, 11.25));
-workWeek.addWork(0, Work.valueOf(projects[1].tasks[0], 14, 18));
-workWeek.addWork(new Date(2018, 7, 21), Work.valueOf(projects[0].tasks[0], 8, 18));
-workWeek.addWork(4, Work.valueOf(projects[0].tasks[0], 8, 9));
-workWeek.addWork(4, Work.valueOf(projects[0].tasks[1], 9, 11.25));
-workWeek.addWork(4, Work.valueOf(projects[1].tasks[0], 13, 18));
+const weekWork = new WeekWork(new Date(2018, 7, 20));
+weekWork.addWork(0, Work.valueOf(projects[0].tasks[0], 8, 9));
+weekWork.addWork(0, Work.valueOf(projects[0].tasks[1], 9, 11.25));
+weekWork.addWork(0, Work.valueOf(projects[1].tasks[0], 14, 18));
+weekWork.addWork(new Date(2018, 7, 21), Work.valueOf(projects[0].tasks[0], 8, 18));
+weekWork.addWork(4, Work.valueOf(projects[0].tasks[0], 8, 9));
+weekWork.addWork(4, Work.valueOf(projects[0].tasks[1], 9, 11.25));
+weekWork.addWork(4, Work.valueOf(projects[1].tasks[0], 13, 18));
 
 const allTasks = [];
 projects.forEach(p => p.tasks.forEach(t => allTasks.push(t)));
 
-Log.trace(workWeek);
+Log.trace(weekWork);
 Log.trace(allTasks);
 
 class App extends Component {
@@ -48,7 +48,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <WorkWeekGrid data={workWeek} tasks={allTasks} />
+        <WeekWorkGrid data={weekWork} tasks={allTasks} />
         <div style={{ textAlign: 'left' }}>
           {this.state.showTaskSearch || <button onClick={() => this.openTaskSelector()}>Select task</button>}
           <TaskSearch

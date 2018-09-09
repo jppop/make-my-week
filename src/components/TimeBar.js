@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Rnd } from 'react-rnd';
 import Color from 'color';
-import { Work } from '../domain/WorkWeek';
+import { Work } from '../domain/WeekWork';
 import Log from '../Log';
 
 // see https://github.com/bokuweb/react-rnd

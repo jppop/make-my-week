@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Task } from '../domain/WorkWeek';
+import { Task } from '../domain/WeekWork';
 import Log from '../Log';
 
 type Props = {

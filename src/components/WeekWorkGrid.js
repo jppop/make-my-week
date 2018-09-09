@@ -31,12 +31,8 @@ export default class WeekWorkGrid extends Component {
   constructor(props) {
     super(props);
 
-    const weekWorks = [];
-    props.data.timelines.forEach(timeline => {
-      return timeline.works.map(work => weekWorks.push(work));
-    });
     this.state = {
-      weekWorks: weekWorks,
+      weekWorks: [...props.data.works],
       showTaskSearch: false,
       taskSearchPosition: { x: 0, y: 0 }
     };
@@ -179,8 +175,6 @@ export default class WeekWorkGrid extends Component {
     this.styles.tickCell.bind(this);
     this.styles.scaleCell.bind(this);
 
-    // this.onWorkItemUpdate.bind(this);
-    // this.onGridClick.bind(this);
   }
 
   render() {
@@ -222,14 +216,16 @@ export default class WeekWorkGrid extends Component {
     };
 
     const Grid = props => {
-      const { hasLunchTime, lunchTime, startTime, endTime } = props.weekwork.settings;
-      return props.weekwork.timelines.map((timeline, dayIndex) => {
+      const { hasLunchTime, lunchTime, startTime, endTime, daysPerWeek } = props.weekwork.settings;
+  
+      let grid = [];
+      for (let dayIndex = 0; dayIndex < daysPerWeek; dayIndex++) {
         let day = new Date(props.weekwork.day);
-        day.setDate(props.weekwork.day.getDate() + dayIndex);
-        return (
+        day.setDate(day.getDate() + dayIndex);
+        grid.push(
           <DayGrid
             key={'day-grid#' + dayIndex}
-            day={timeline.day || day}
+            day={day}
             start={startTime}
             end={endTime}
             isFirstChild={dayIndex === 0}
@@ -238,7 +234,8 @@ export default class WeekWorkGrid extends Component {
             lunchTimeEnd={hasLunchTime ? lunchTime.end : -1}
           />
         );
-      });
+      }
+      return grid;
     };
 
     const ScaleCell = props => {
@@ -311,7 +308,7 @@ export default class WeekWorkGrid extends Component {
       });
     };
 
-    const boundStyle = this.styles.bounds(this.props.data.timelines.length);
+    const boundStyle = this.styles.bounds(this.props.data.works.length);
 
     return (
       <div style={this.styles.container}>

@@ -123,7 +123,7 @@ type WeekWorkOption = {
 export class WeekWork {
   day: Date
   settings: WeekWorkOption
-  timelines: DayWork[]
+  works: Work[]
 
   constructor(day: Date = new Date(), options?: any) {
     this.day = day;
@@ -140,11 +140,7 @@ export class WeekWork {
     } else {
       this.settings = Object.assign(defaultOptions);
     }
-    this.timelines = Array(this.settings.daysPerWeek)
-      .fill(null)
-      .map(() => {
-        return { works: [] };
-      });
+    this.works = [];
   }
 
   addWork(day: number | Date, work: Work): Work {
@@ -156,7 +152,7 @@ export class WeekWork {
 
     let dayIndex = work.dayIndex || 0;
     if (0 <= dayIndex && dayIndex < weekWork.settings.daysPerWeek) {
-      weekWork.timelines[dayIndex].works.push(work);
+      weekWork.works.push(work);
     }
     return work;
   }

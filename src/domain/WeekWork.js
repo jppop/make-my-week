@@ -64,6 +64,7 @@ export class Work {
   lunchTime: ?LunchTime
   _dayIndex: number
   workTime: number[]
+  label: string
 
   constructor(task: Task, workId: string, start: number, end: number) {
     this.id = {
@@ -71,6 +72,7 @@ export class Work {
       task: task.id,
       work: workId
     };
+    this.label = task.projectId + ' - ' + task.label;
     this.startTime = new Date();
     let hm = hoursAndMinutes(start);
     this.startTime.setHours(hm.hours, hm.minutes, 0, 0);

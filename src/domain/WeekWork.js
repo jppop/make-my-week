@@ -163,7 +163,7 @@ export class Work {
   }
 }
 
-type WeekWorkOption = {
+export type WeekWorkOption = {
   daysPerWeek: number,
   hasLunchTime: boolean,
   lunchTime: LunchTime,
@@ -253,7 +253,7 @@ export class WeekWork {
       }
     }
     if (work.start >= work.end) {
-      throw new Error('invalid work. start > end');
+      throw new Error('invalid work. start >= end');
     }
   }
   static sortWorks(works: Work[]): Work[] {

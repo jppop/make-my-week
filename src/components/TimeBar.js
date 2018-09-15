@@ -46,7 +46,6 @@ export class TimeBar extends React.Component<Props, State> {
     dragSizeIncrement: 1,
     maxWidth: undefined,
     boundsSelector: undefined,
-    onWorkItemUpdate: () => {},
     contextMenuHandler: () => {},
     onDragStart: () => {},
     onDragStop: () => {}
@@ -119,9 +118,7 @@ export class TimeBar extends React.Component<Props, State> {
           workItem.start = workItem.workTime[0] + data.lastX / unitX;
           workItem.end = workItem.start + duration;
           workItem.dayIndex = data.lastY / unitY;
-          if (this.props.onWorkItemUpdate) {
-            this.props.onWorkItemUpdate(workItem);
-          }
+          this.props.onWorkItemUpdate(workItem);
           this.setState({
             workItem: workItem
           });

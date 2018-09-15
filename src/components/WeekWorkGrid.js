@@ -4,20 +4,25 @@ import PropTypes from 'prop-types';
 import TimeBar from './TimeBar';
 import TaskSearch from './TaskSearch';
 import moment from 'moment';
-import { WeekWork, Work } from '../domain/WeekWork';
+import { Work } from '../domain/WeekWork';
 import Log from '../Log';
 
 const QUATER_WIDTH = 16;
 
 export default class WeekWorkGrid extends Component {
   static propTypes = {
-    data: PropTypes.object.isRequired,
+    works: PropTypes.arrayOf(Work).isRequired,
+    settings: PropTypes.object.isRequired,
+    startDay: PropTypes.instanceOf(Date).isRequired,
     tasks: PropTypes.array.isRequired,
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,
     rightMargin: PropTypes.number,
-    quarterWidth: PropTypes.number
+    quarterWidth: PropTypes.number,
+    addWorkItemHandler: PropTypes.func.isRequired,
+    removeWorkItemHandler: PropTypes.func.isRequired,
+    updateWorkItemHandler: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -32,7 +37,6 @@ export default class WeekWorkGrid extends Component {
     super(props);
 
     this.state = {
-      weekWorks: [...props.data.works],
       showTaskSearch: false,
       taskSearchPosition: { x: 0, y: 0 }
     };
@@ -154,7 +158,7 @@ export default class WeekWorkGrid extends Component {
         return style;
       },
       bounds: lines => {
-        const { settings } = this.props.data;
+        const { settings } = this.props;
         return {
           position: 'absolute',
           left: this.props.leftMargin + 3,
@@ -174,11 +178,10 @@ export default class WeekWorkGrid extends Component {
     this.styles.bounds.bind(this);
     this.styles.tickCell.bind(this);
     this.styles.scaleCell.bind(this);
-
   }
 
   render() {
-    const { settings } = this.props.data;
+    const { settings } = this.props;
     Log.trace(settings, 'WeekWorkGrid::render');
 
     const GridCell = props => {
@@ -216,11 +219,11 @@ export default class WeekWorkGrid extends Component {
     };
 
     const Grid = props => {
-      const { hasLunchTime, lunchTime, startTime, endTime, daysPerWeek } = props.weekwork.settings;
-  
+      const { hasLunchTime, lunchTime, startTime, endTime, daysPerWeek } = props.settings;
+
       let grid = [];
       for (let dayIndex = 0; dayIndex < daysPerWeek; dayIndex++) {
-        let day = new Date(props.weekwork.day);
+        let day = new Date(props.startDay);
         day.setDate(day.getDate() + dayIndex);
         grid.push(
           <DayGrid
@@ -304,17 +307,17 @@ export default class WeekWorkGrid extends Component {
       });
     };
 
-    const boundStyle = this.styles.bounds(this.props.data.works.length);
+    const boundStyle = this.styles.bounds(this.props.works.length);
 
     return (
       <div style={this.styles.container}>
         <Scale start={settings.startTime} end={settings.endTime} />
         <Tick start={settings.startTime} end={settings.endTime} />
-        <Grid weekwork={this.props.data} />
+        <Grid settings={this.props.settings} startDay={this.props.startDay} />
         <div ref={this.bounds} id="bounds" style={boundStyle} onClick={this._onAddWorkItem}>
           <div>
             <Works
-              weekwork={this.state.weekWorks}
+              weekwork={this.props.works}
               boundsSelector="#bounds"
               quarterWidth={this.props.quarterWidth}
               cellWidth={this.props.cellWidth}
@@ -342,21 +345,6 @@ export default class WeekWorkGrid extends Component {
     );
   }
 
-  onWorkItemUpdate = workItem => {
-    let workIndex = this.state.weekWorks.findIndex(w => w.id.work === workItem.id.work);
-    Log.trace(`workIndex: ${workIndex}`, 'WeekWorkGrid::onWorkItemUpdate');
-    if (workIndex !== -1) {
-      let newWeekworks = [...this.state.weekWorks];
-      newWeekworks.splice(workIndex, 1, workItem);
-      WeekWork.fixWork(newWeekworks, workItem);
-      Log.trace(newWeekworks);
-      this.setState({
-        weekWorks: newWeekworks
-      });
-      Log.trace(newWeekworks, 'WeekWorkGrid::onWorkItemUpdate');
-    }
-  }
-
   newWorkItem = {
     startTime: NaN,
     endTime: NaN,
@@ -372,7 +360,7 @@ export default class WeekWorkGrid extends Component {
     const { offsetX, offsetY } = e.nativeEvent;
     Log.trace(`position: (${offsetX}, ${offsetY})`, 'WeekWorkGrid::onAddWorkItem');
 
-    const { startTime, defaultWorkDuration } = this.props.data.settings;
+    const { startTime, defaultWorkDuration } = this.props.settings;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
     const { clientX, clientY } = e;
@@ -393,26 +381,17 @@ export default class WeekWorkGrid extends Component {
   }
 
   _addWorkItem = task => {
-    const workItem = Work.valueOf(task, this.newWorkItem.startTime, this.newWorkItem.endTime);
-    WeekWork.attach(this.props.data, this.newWorkItem.dayIndex, workItem);
-    let newWeekworks = [...this.state.weekWorks, workItem];
-    WeekWork.fixWork(newWeekworks, workItem);
-
-    this.setState(prevState => ({
-      weekWorks: newWeekworks
-    }));
+    const { startTime, endTime, dayIndex } = this.newWorkItem;
+    this.props.addWorkItemHandler(task, dayIndex, startTime, endTime);
   }
+
+  onWorkItemUpdate = workItem => {
+    Log.trace(workItem, 'WeekWorkGrid::onWorkItemUpdate');
+    this.props.updateWorkItemHandler(workItem);
+  }
+
   _onRemoveWorkItem = workItem => {
-    let workIndex = this.state.weekWorks.findIndex(w => w.id.work === workItem.id.work);
-    Log.trace(`workIndex: ${workIndex}`);
-    if (workIndex !== -1) {
-      let newWeekWorks = [...this.state.weekWorks];
-      newWeekWorks.splice(workIndex, 1);
-      Log.trace(newWeekWorks);
-      this.setState({
-        weekWorks: newWeekWorks
-      });
-    }
+    this.props.removeWorkItemHandler(workItem);
   }
   _closeTaskSelector = () => {
     this.setState({ showTaskSearch: false });

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import WeekWorkGrid from './components/WeekWorkGrid';
-import TaskSearch from './components/TaskSearch';
+import WeekWorkComponent from './components/WeekWorkComponent';
 import { WeekWork, Work, Task, Project } from './domain/WeekWork';
 import Log from './Log';
 import faker from 'faker';
@@ -48,23 +47,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <WeekWorkGrid data={weekWork} tasks={allTasks} />
-        <div style={{ textAlign: 'left' }}>
-          {this.state.showTaskSearch || <button onClick={() => this.openTaskSelector()}>Select task</button>}
-          <TaskSearch
-            tasks={allTasks}
-            close={() => {
-              this.closeTaskSelector();
-            }}
-            onSelectTask={task => {
-              Log.trace(task);
-              this.setState({ showTaskSearch: false });
-            }}
-            showing={this.state.showTaskSearch}
-            x={20}
-            y={20}
-          />
-        </div>
+        <WeekWorkComponent weekWork={weekWork} tasks={allTasks} />
       </div>
     );
   }

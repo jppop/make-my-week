@@ -4,6 +4,7 @@ import { WeekWork, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
 import moment from 'moment';
+import Timeline from './Timeline';
 
 type Props = {
   weekWork: WeekWork,
@@ -52,7 +53,8 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
           updateWorkItemHandler={this.onWorkItemUpdate}
         />
         <div style={{ textAlign: 'left' }}>
-          <ol>{workTimeLine}</ol>
+          {/* <ol>{workTimeLine}</ol> */}
+          <Timeline works={works} />
         </div>
       </div>
     );

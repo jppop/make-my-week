@@ -48,6 +48,7 @@ export default class WeekWorkGrid extends Component {
         position: 'relative',
         fontFamily: '\'Roboto\', sans-serif',
         fontSize: 12,
+        boxSizing: 'content-box',
         zIndex: 0
       },
 

@@ -26,10 +26,7 @@ type Props = {
 }
 
 type State = {
-  workItem: Work,
-  width: number,
-  x: number,
-  y: number
+  workItem: Work
 }
 
 /**
@@ -58,17 +55,17 @@ export class TimeBar extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      workItem: props.workItem,
-      width: props.width,
-      x: props.x,
-      y: props.y
+      workItem: props.workItem
     };
   }
 
   render() {
-    let color = Color(this.props.color);
+    const [unitX, unitY] = this.props.unit;
+    const workItem = this.state.workItem;
+
+    let color = Color(workItem.color);
     const style = {
-      backgroundColor: this.props.color,
+      backgroundColor: workItem.color,
       color: color.isDark() ? 'white' : 'black'
     };
 
@@ -85,24 +82,23 @@ export class TimeBar extends React.Component<Props, State> {
       <Rnd
         style={style}
         default={{
-          x: this.state.x,
-          y: this.props.y,
-          width: this.state.width,
+          x: unitX * (workItem.start - workItem.workTime[0]),
+          y: unitY * workItem.dayIndex,
+          width: unitX * workItem.duration() - 1,
           height: this.props.height
         }}
         onResizeStop={(e, direction, ref, d, position) => {
-          let newState = { width: this.state.width + d.width, workItem: undefined };
           if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(this.state.workItem);
-            if (newWorkItem) {
-              newState.workItem = newWorkItem;
-            }
+            const workItem = this.state.workItem.clone();
+            this.props.onWorkItemUpdate(workItem);
+            this.setState({
+              workItem: workItem
+            });
           }
-          this.setState(newState);
         }}
         onResize={(e, direction, ref, d, position) => {
           let width = ref.offsetWidth;
-          let duration = width / this.props.unit[0];
+          let duration = width / unitX;
           // round duration up to the nearest quater of hour
           duration = (Math.ceil((duration * 100) / 25.0) * 25) / 100;
           let workItem = this.state.workItem.clone();
@@ -118,20 +114,15 @@ export class TimeBar extends React.Component<Props, State> {
         onDragStop={(e, data) => {
           e.stopPropagation();
           Log.trace({ event: e, data: data }, 'TimeBar::OnDragStop');
-          let workItem = this.state.workItem.clone();
+          const workItem = this.state.workItem.clone();
           const duration = workItem.duration();
-          workItem.start = workItem.workTime[0] + data.lastX / this.props.unit[0];
+          workItem.start = workItem.workTime[0] + data.lastX / unitX;
           workItem.end = workItem.start + duration;
-          workItem.dayIndex = data.lastY / this.props.unit[1];
+          workItem.dayIndex = data.lastY / unitY;
           if (this.props.onWorkItemUpdate) {
-            let newWorkItem = this.props.onWorkItemUpdate(workItem);
-            if (newWorkItem) {
-              workItem = newWorkItem;
-            }
+            this.props.onWorkItemUpdate(workItem);
           }
           this.setState({
-            x: data.lastX,
-            y: data.lastY,
             workItem: workItem
           });
         }}

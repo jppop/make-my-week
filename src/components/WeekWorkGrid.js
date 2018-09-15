@@ -297,10 +297,6 @@ export default class WeekWorkGrid extends Component {
             boundsSelector={props.boundsSelector}
             dragSizeIncrement={props.quarterWidth}
             maxWidth={props.maxWidth}
-            x={(props.cellWidth + 2) * (work.start - props.startTime)}
-            y={(props.cellHeight + 2) * work.dayIndex}
-            width={(props.cellWidth + 2) * work.duration() - 1}
-            color={work.color}
             onWorkItemUpdate={this.onWorkItemUpdate}
             contextMenuHandler={() => props.contextMenuHandler(work)}
           />
@@ -324,7 +320,7 @@ export default class WeekWorkGrid extends Component {
               cellWidth={this.props.cellWidth}
               cellHeight={this.props.cellHeight}
               startTime={settings.startTime}
-              contextMenuHandler={this.onRemoveWorkItem}
+              contextMenuHandler={this._onRemoveWorkItem}
             />
             <TaskSearch
               tasks={this.props.tasks}
@@ -352,10 +348,12 @@ export default class WeekWorkGrid extends Component {
     if (workIndex !== -1) {
       let newWeekworks = [...this.state.weekWorks];
       newWeekworks.splice(workIndex, 1, workItem);
+      WeekWork.fixWork(newWeekworks, workItem);
       Log.trace(newWeekworks);
       this.setState({
         weekWorks: newWeekworks
       });
+      Log.trace(newWeekworks, 'WeekWorkGrid::onWorkItemUpdate');
     }
   }
 
@@ -395,14 +393,16 @@ export default class WeekWorkGrid extends Component {
   }
 
   _addWorkItem = task => {
-    const work = Work.valueOf(task, this.newWorkItem.startTime, this.newWorkItem.endTime);
-    WeekWork.attach(this.props.data, this.newWorkItem.dayIndex, work);
+    const workItem = Work.valueOf(task, this.newWorkItem.startTime, this.newWorkItem.endTime);
+    WeekWork.attach(this.props.data, this.newWorkItem.dayIndex, workItem);
+    let newWeekworks = [...this.state.weekWorks, workItem];
+    WeekWork.fixWork(newWeekworks, workItem);
 
     this.setState(prevState => ({
-      weekWorks: [...prevState.weekWorks, work]
+      weekWorks: newWeekworks
     }));
   }
-  onRemoveWorkItem = workItem => {
+  _onRemoveWorkItem = workItem => {
     let workIndex = this.state.weekWorks.findIndex(w => w.id.work === workItem.id.work);
     Log.trace(`workIndex: ${workIndex}`);
     if (workIndex !== -1) {

@@ -21,7 +21,7 @@ const weekWork = new WeekWork(new Date(2018, 7, 20));
 weekWork.addWork(0, Work.valueOf(projects[0].tasks[0], 8, 9));
 weekWork.addWork(0, Work.valueOf(projects[0].tasks[1], 9, 11.25));
 weekWork.addWork(0, Work.valueOf(projects[1].tasks[0], 14, 18));
-weekWork.addWork(new Date(2018, 7, 21), Work.valueOf(projects[0].tasks[0], 8, 18));
+weekWork.addWork(1, Work.valueOf(projects[0].tasks[0], 8, 18));
 weekWork.addWork(4, Work.valueOf(projects[0].tasks[0], 8, 9));
 weekWork.addWork(4, Work.valueOf(projects[0].tasks[1], 9, 11.25));
 weekWork.addWork(4, Work.valueOf(projects[1].tasks[0], 13, 18));

@@ -68,7 +68,7 @@ export default class TaskSearch extends React.Component<Props, State> {
   }
 
   componentDidUpdate() {
-    Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
+    // Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
 
     if (this.textInput) {
       this.textInput.focus();

@@ -11,7 +11,7 @@ const QUATER_WIDTH = 16;
 
 export default class WeekWorkGrid extends Component {
   static propTypes = {
-    works: PropTypes.arrayOf(Work).isRequired,
+    works: PropTypes.arrayOf(PropTypes.instanceOf(Work)).isRequired,
     settings: PropTypes.object.isRequired,
     startDay: PropTypes.instanceOf(Date).isRequired,
     tasks: PropTypes.array.isRequired,

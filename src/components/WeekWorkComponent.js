@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import Log from '../Log';
-import moment from 'moment';
 import WorkTimeline from './WorkTimeline';
 import { WeekWork, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';

@@ -11,17 +11,19 @@ import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = (theme: Object) => ({
   root: {
     textAlign: 'left',
     marginTop: theme.spacing.unit * 3,
     padding: `0 ${theme.spacing.unit * 3}px`,
-    maxWidth: 500,
+    maxWidth: 700,
     overflow: 'auto',
     maxHeight: 700,
     zIndex: theme.zIndex.appBar,
-    position: 'relative'
+    position: 'relative',
+    flexGrow: 1
   },
   timeline: {
     zIndex: theme.zIndex.appBar
@@ -36,9 +38,7 @@ const styles = (theme: Object) => ({
     width: 16,
     zIndex: theme.zIndex.appBar
   },
-  workDetail: {
-    flexGrow: 1
-  }
+  workDetail: {}
 });
 
 type ProvidedProps = {
@@ -58,7 +58,7 @@ function ActionsIcons(props) {
         classes={{
           root: classes.actionButton
         }}
-        color="primary"
+        color="secondary"
         // size="small"
         aria-label="Edit work"
       >
@@ -92,8 +92,29 @@ const WorkDetails = props => {
   const { classes, work } = props; // eslint-disable-line react/prop-types
   return (
     <Grid container className={classes.workDetail} spacing={0}>
-      <Grid item>
+      <Grid item xs={12}>
         <Duration duration={work.duration(true)} />
+        <LinearProgress variant="determinate" value={Math.random() * 100} />
+        <Grid container spacing={0} alignContent="flex-end">
+          <Grid item xs={2}>
+            <Typography variant="body1">Planned:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">4 days</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">Done:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">2.5 days</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body2">To be done:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body2">2.5 days</Typography>
+          </Grid>
+        </Grid>
         <Typography component="p">any comment</Typography>
       </Grid>
     </Grid>

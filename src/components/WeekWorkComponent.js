@@ -4,7 +4,7 @@ import { WeekWork, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
 import moment from 'moment';
-import Timeline from './Timeline';
+import WorkTimeline from './WorkTimeline';
 
 type Props = {
   weekWork: WeekWork,
@@ -26,21 +26,6 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
     const { works, startDay } = this.state;
     const { settings } = this.props.weekWork;
 
-    const workTimeLine = works.map(work => {
-      return (
-        <li key={work.id.work}>
-          <span style={{ backgroundColor: work.color, width: 16 }}>&nbsp;</span>
-          <span>{work.label}</span>
-          <br />
-          <span>{moment(work.startTime).format('YYYY/MM/DD')}</span>
-          &nbsp;
-          <span>{moment(work.startTime).format('HH:mm')}</span>
-          &nbsp;
-          <span>{moment(work.endTime).format('HH:mm')}</span>
-          &nbsp;
-        </li>
-      );
-    });
     return (
       <div>
         <WeekWorkGrid
@@ -53,8 +38,7 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
           updateWorkItemHandler={this.onWorkItemUpdate}
         />
         <div style={{ textAlign: 'left' }}>
-          {/* <ol>{workTimeLine}</ol> */}
-          <Timeline works={works} />
+          <WorkTimeline works={works} />
         </div>
       </div>
     );

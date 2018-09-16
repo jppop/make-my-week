@@ -29,11 +29,11 @@ const styles = {
       fontSize: 11,
       left: x,
       top: y,
-      zIndex: 10,
-      cursor: 'auto'
+      cursor: 'auto',
+      zIndex: 2100
     };
   },
-  taskContainer: { width: 350, height: selectorHeight - 40, overflow: 'auto' },
+  taskContainer: { width: 350, height: selectorHeight - 40, overflow: 'auto', zIndex: 2100, position: 'relative' },
   tasks: { textAlign: 'left', margin: 0, paddingLeft: 20, listStyle: 'none' }
 };
 

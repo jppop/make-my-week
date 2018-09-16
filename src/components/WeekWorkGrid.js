@@ -50,7 +50,7 @@ export default class WeekWorkGrid extends Component {
         fontSize: 12,
         boxSizing: 'content-box',
         zIndex: 0,
-        webkitFontSmoothing: 'auto'
+        WebkitFontSmoothing: 'auto'
       },
 
       grid: isFirstChild => {

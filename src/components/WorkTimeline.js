@@ -79,13 +79,15 @@ function ActionsIcons(props) {
     </Tooltip>
   ];
 }
-const Duration = props => {
-  const { duration } = props; // eslint-disable-line react/prop-types
-  const hour = Math.trunc(duration);
-  const minutes = (duration - hour) * 60;
-  const durationAsString = hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-
-  return <Typography variant="caption">Duration: {durationAsString}</Typography>;
+const TaskCompletion = () => {
+  const completion = Math.random() * 100;
+  const completionPercent = parseFloat(completion).toFixed(2);
+  return (
+    <div>
+      <Typography variant="caption">completion: {completionPercent}%</Typography>
+      <LinearProgress variant="determinate" value={completion} />
+    </div>
+  );
 };
 
 const WorkDetails = props => {
@@ -93,8 +95,7 @@ const WorkDetails = props => {
   return (
     <Grid container className={classes.workDetail} spacing={0}>
       <Grid item xs={12}>
-        <Duration duration={work.duration(true)} />
-        <LinearProgress variant="determinate" value={Math.random() * 100} />
+        <TaskCompletion />
         <Grid container spacing={0} alignContent="flex-end">
           <Grid item xs={2}>
             <Typography variant="body1">Planned:</Typography>
@@ -115,17 +116,21 @@ const WorkDetails = props => {
             <Typography variant="body2">2.5 days</Typography>
           </Grid>
         </Grid>
-        <Typography component="p">any comment</Typography>
+        <Typography component="p">hard-coded data</Typography>
       </Grid>
     </Grid>
   );
 };
 
-const workCreateAt = (work: Work): string => {
+const timelineInfo = (work: Work): string => {
   const day = moment(work.startTime).format('dddd DD MMM');
   const start = moment(work.startTime).format('HH:mm');
   const end = moment(work.endTime).format('HH:mm');
-  return `${day} : ${start} - ${end}`;
+  const duration = work.duration(true);
+  const hour = Math.trunc(duration);
+  const minutes = (duration - hour) * 60;
+  const durationAsString = hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+  return `${day} : ${start} - ${end} (${durationAsString})`;
 };
 
 class WorkTimeline extends React.Component<ProvidedProps & Props> {
@@ -137,7 +142,7 @@ class WorkTimeline extends React.Component<ProvidedProps & Props> {
         <TimelineEvent
           key={work.id.work}
           title={work.label}
-          createdAt={workCreateAt(work)}
+          createdAt={timelineInfo(work)}
           icon={<Icon>donut_large</Icon>}
           iconColor="darkgrey"
           buttons={<ActionsIcons classes={classes} keyBase={work.id.work} />}

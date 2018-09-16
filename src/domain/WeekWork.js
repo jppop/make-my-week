@@ -37,12 +37,23 @@ export class Task {
   label: string
   color: string
   projectId: string
+  planned: number
+  completed: number
 
-  constructor(id: string, label: string, color: string) {
+  constructor(id: string, label: string, color: string, planned: number = 0, completed: number = 0) {
     this.id = id;
     this.label = label;
     this.color = color;
     this.projectId = 'none';
+    this.planned = planned;
+    this.completed = completed;
+  }
+
+  addWork(duration: number) {
+    this.completed += duration;
+  }
+  removeWork(duration: number) {
+    this.completed -= duration;
   }
 }
 
@@ -66,20 +77,28 @@ export class Work {
   workTime: number[]
   label: string
 
-  constructor(task: Task, workId: string, start: number, end: number) {
+  constructor(
+    projectId: string,
+    taskId: string,
+    workId: string,
+    start: number,
+    end: number,
+    label: string,
+    color: string
+  ) {
     this.id = {
-      project: task.projectId,
-      task: task.id,
+      project: projectId,
+      task: taskId,
       work: workId
     };
-    this.label = task.projectId + ' - ' + task.label;
+    this.label = label;
     this.startTime = new Date();
     let hm = hoursAndMinutes(start);
     this.startTime.setHours(hm.hours, hm.minutes, 0, 0);
     this.endTime = new Date();
     hm = hoursAndMinutes(end);
     this.endTime.setHours(hm.hours, hm.minutes, 0, 0);
-    this.color = task.color;
+    this.color = color;
     this.hasLunchTime = false;
     this.workTime = [0, 24];
     this._dayIndex = 0;
@@ -129,12 +148,15 @@ export class Work {
     const workId = Math.random()
       .toString(36)
       .substr(2);
-    const work = new Work(task, workId, start, end);
+    const label = task.projectId + '-' + task.label;
+    const work = new Work(task.projectId, task.id, workId, start, end, label, task.color);
     return work;
   }
   clone(): Work {
-    let workItem: Work = Object.assign(Object.create(Object.getPrototypeOf((this: any))), this);
-    return workItem;
+    // let workItem: Work = Object.assign(Object.create(Object.getPrototypeOf((this: any))), this);
+    const newWork = new Work(this.id.project, this.id.task, this.id.work, this.start, this.end, this.label, this.color);
+    newWork.dayIndex = this.dayIndex;
+    return newWork;
   }
   duration(adjusted: boolean = false): number {
     let duration;
@@ -178,6 +200,7 @@ export class WeekWork {
   day: Date
   settings: WeekWorkOption
   works: Work[]
+  worker: string
 
   constructor(day: Date = new Date(), options?: any) {
     this.day = day;
@@ -196,6 +219,7 @@ export class WeekWork {
       this.settings = Object.assign(defaultOptions);
     }
     this.works = [];
+    this.worker = 'me';
   }
 
   addWork(day: number, work: Work): Work {
@@ -267,5 +291,101 @@ export class WeekWork {
       }
     });
     return works;
+  }
+}
+
+export class ProjectManager {
+  projects: Project[]
+  weekWork: ?WeekWork
+
+  constructor(projects: Project[], weekWork: ?WeekWork) {
+    this.projects = [];
+    if (weekWork) {
+      this.weekWork = weekWork;
+    }
+  }
+
+  addProject = (id: string, label: string): Project => {
+    const projectIndex = this.projects.findIndex(p => p.id === id);
+    if (projectIndex >= 0) {
+      throw new Error('project already exists');
+    }
+    const project = new Project(id, label);
+    this.projects.push(project);
+    return project;
+  }
+
+  getTasks = (projectId: string): Task[] => {
+    const project = this.projects.find(p => p.id === projectId);
+    if (project == null) {
+      throw new Error('project not found');
+    }
+    return project.tasks;
+  }
+
+  addTask(
+    projectId: string,
+    id: string,
+    label: string,
+    color: string,
+    planned: number = 0,
+    completed: number = 0
+  ): Task {
+    const project = this.projects.find(p => p.id === projectId);
+    if (project == null) {
+      throw new Error('project not found');
+    }
+    const task = new Task(id, label, color, planned, completed);
+    project.addTask(task);
+    return task;
+  }
+
+  addWork = (projectId: string, taskId: string, dayIndex: number, start: number, end: number): Work => {
+    if (this.weekWork == null) {
+      this.weekWork = new WeekWork(new Date());
+    }
+    // find task
+    const tasks = this.getTasks(projectId);
+    const task = tasks.find(t => t.id === taskId);
+    if (task == null) {
+      throw new Error('No task found');
+    }
+    const work = Work.valueOf(task, start, end);
+    // $FlowFixMe
+    this.weekWork.addWork(dayIndex, work);
+    task.addWork(work.duration(true));
+    return work.clone();
+  }
+
+  deleteWork = (workId: string): Work => {
+    if (this.weekWork == null) {
+      throw new Error('No work found');
+    }
+    const works = this.weekWork.works;
+    let workIndex = works.findIndex(w => w.id.work === workId);
+    if (workIndex === -1) {
+      throw new Error('No work found');
+    }
+    const deletedWork = works[workIndex];
+
+    const tasks = this.getTasks(deletedWork.id.project);
+
+    // remove work
+    const newWorks = [...works];
+    newWorks.splice(workIndex, 1);
+    // $FlowFixMe
+    this.weekWork.works = newWorks;
+
+    // update task counter
+    const task = tasks.find(t => t.id === deletedWork.id.task);
+    if (task != null) {
+      task.removeWork(deletedWork.duration(true));
+    }
+    return deletedWork;
+  }
+
+  updateWork = (workItem: Work): Work => {
+    const previousWork = this.deleteWork(workItem.id.work);
+    return this.addWork(workItem.id.project, previousWork.id.task, workItem.dayIndex, workItem.start, workItem.end);
   }
 }

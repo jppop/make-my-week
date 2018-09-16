@@ -57,7 +57,7 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
   }
 
   onRemoveWorkItem = (workItem: Work): void => {
-    let workIndex = this.state.works.findIndex(w => w.id.work === workItem.id.work);
+    const workIndex = this.state.works.findIndex(w => w.id.work === workItem.id.work);
     if (workIndex !== -1) {
       let newWeekWorks = [...this.state.works];
       newWeekWorks.splice(workIndex, 1);
@@ -68,7 +68,7 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
   }
 
   onWorkItemUpdate = (workItem: Work): void => {
-    let workIndex = this.state.works.findIndex(w => w.id.work === workItem.id.work);
+    const workIndex = this.state.works.findIndex(w => w.id.work === workItem.id.work);
     Log.trace(`workIndex: ${workIndex}`, 'WeekWorkComponent::onWorkItemUpdate');
     if (workIndex !== -1) {
       let newWeekworks = [...this.state.works];

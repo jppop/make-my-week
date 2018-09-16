@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react';
-import { WeekWork, Work, Task } from '../domain/WeekWork';
-import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
 import moment from 'moment';
 import WorkTimeline from './WorkTimeline';
+import { WeekWork, Work, Task } from '../domain/WeekWork';
+import WeekWorkGrid from './WeekWorkGrid';
 
 type Props = {
   weekWork: WeekWork,
@@ -15,7 +15,7 @@ type State = {
   startDay: Date
 }
 export default class WeekWorkComponent extends React.Component<Props, State> {
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       works: this.props.weekWork.works,

@@ -27,8 +27,13 @@ const styles = (theme: Object) => ({
     zIndex: theme.zIndex.appBar
   },
   actionButton: {
-    height: 24,
-    width: 24,
+    height: 20,
+    width: 20,
+    zIndex: theme.zIndex.appBar
+  },
+  actionIcon: {
+    height: 16,
+    width: 16,
     zIndex: theme.zIndex.appBar
   },
   workDetail: {
@@ -57,7 +62,7 @@ function ActionsIcons(props) {
         // size="small"
         aria-label="Edit work"
       >
-        <EditIcon />
+        <EditIcon className={classes.actionIcon} />
       </IconButton>
     </Tooltip>,
     <Tooltip key={keyBase + '-action-delete'} title="Delete work">
@@ -69,7 +74,7 @@ function ActionsIcons(props) {
         size="small"
         aria-label="Delete work"
       >
-        <DeleteIcon />
+        <DeleteIcon className={classes.actionIcon} />
       </IconButton>
     </Tooltip>
   ];

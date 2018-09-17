@@ -12,12 +12,11 @@ const hoursAndMinutes = (time: number) => {
 export class Project {
   id: string
   label: string
-  tasks: Task[]
+  tasks: Task[] = []
 
   constructor(id: string, label: string) {
     this.id = id;
     this.label = label;
-    this.tasks = [];
   }
   addTask(task: Task) {
     task.projectId = this.id;
@@ -84,7 +83,9 @@ export class Work {
     start: number,
     end: number,
     label: string,
-    color: string
+    color: string,
+    workTime: Array<number> = [0, 24],
+    dayIndex: number = 0
   ) {
     this.id = {
       project: projectId,
@@ -100,8 +101,9 @@ export class Work {
     this.endTime.setHours(hm.hours, hm.minutes, 0, 0);
     this.color = color;
     this.hasLunchTime = false;
-    this.workTime = [0, 24];
-    this._dayIndex = 0;
+    this.workTime = workTime;
+    this._dayIndex = dayIndex;
+    this.dayIndex = dayIndex;
   }
 
   get start(): number {
@@ -148,14 +150,16 @@ export class Work {
     const workId = Math.random()
       .toString(36)
       .substr(2);
-    const label = task.projectId + '-' + task.label;
+    const label = task.projectId + ' - ' + task.label;
     const work = new Work(task.projectId, task.id, workId, start, end, label, task.color);
     return work;
   }
   clone(): Work {
     // let workItem: Work = Object.assign(Object.create(Object.getPrototypeOf((this: any))), this);
-    const newWork = new Work(this.id.project, this.id.task, this.id.work, this.start, this.end, this.label, this.color);
-    newWork.dayIndex = this.dayIndex;
+    const newWork = new Work(this.id.project, this.id.task, this.id.work, this.start, 
+      this.end, this.label, this.color, this.workTime, this.dayIndex);
+    newWork.startTime = this.startTime;
+    newWork.endTime = this.endTime;
     return newWork;
   }
   duration(adjusted: boolean = false): number {
@@ -296,12 +300,14 @@ export class WeekWork {
 
 export class ProjectManager {
   projects: Project[]
-  weekWork: ?WeekWork
+  weekWork: WeekWork
 
-  constructor(projects: Project[], weekWork: ?WeekWork) {
+  constructor(weekWork: ?WeekWork) {
     this.projects = [];
     if (weekWork) {
       this.weekWork = weekWork;
+    } else {
+      this.weekWork = new WeekWork(new Date());
     }
   }
 
@@ -323,6 +329,12 @@ export class ProjectManager {
     return project.tasks;
   }
 
+  getAllTasks = (): Task[] => {
+    let tasks: Task[] = [];
+    this.projects.forEach(p => tasks = tasks.concat(p.tasks));
+    return tasks;
+  }
+
   addTask(
     projectId: string,
     id: string,
@@ -340,10 +352,7 @@ export class ProjectManager {
     return task;
   }
 
-  addWork = (projectId: string, taskId: string, dayIndex: number, start: number, end: number): Work => {
-    if (this.weekWork == null) {
-      this.weekWork = new WeekWork(new Date());
-    }
+  addWork = (projectId: string, taskId: string, dayIndex: number, start: number, end: number): Work[] => {
     // find task
     const tasks = this.getTasks(projectId);
     const task = tasks.find(t => t.id === taskId);
@@ -351,16 +360,12 @@ export class ProjectManager {
       throw new Error('No task found');
     }
     const work = Work.valueOf(task, start, end);
-    // $FlowFixMe
     this.weekWork.addWork(dayIndex, work);
     task.addWork(work.duration(true));
-    return work.clone();
+    return this.weekWork.works;
   }
 
-  deleteWork = (workId: string): Work => {
-    if (this.weekWork == null) {
-      throw new Error('No work found');
-    }
+  deleteWork = (workId: string): Work[] => {
     const works = this.weekWork.works;
     let workIndex = works.findIndex(w => w.id.work === workId);
     if (workIndex === -1) {
@@ -373,7 +378,6 @@ export class ProjectManager {
     // remove work
     const newWorks = [...works];
     newWorks.splice(workIndex, 1);
-    // $FlowFixMe
     this.weekWork.works = newWorks;
 
     // update task counter
@@ -381,11 +385,11 @@ export class ProjectManager {
     if (task != null) {
       task.removeWork(deletedWork.duration(true));
     }
-    return deletedWork;
+    return this.weekWork.works;
   }
 
-  updateWork = (workItem: Work): Work => {
-    const previousWork = this.deleteWork(workItem.id.work);
-    return this.addWork(workItem.id.project, previousWork.id.task, workItem.dayIndex, workItem.start, workItem.end);
+  updateWork = (workItem: Work): Work[] => {
+    this.deleteWork(workItem.id.work);
+    return this.addWork(workItem.id.project, workItem.id.task, workItem.dayIndex, workItem.start, workItem.end);
   }
 }

@@ -14,7 +14,7 @@ export default class WeekWorkGrid extends Component {
     works: PropTypes.arrayOf(PropTypes.instanceOf(Work)).isRequired,
     settings: PropTypes.object.isRequired,
     startDay: PropTypes.instanceOf(Date).isRequired,
-    tasks: PropTypes.array.isRequired,
+    tasks: PropTypes.func.isRequired,
     cellHeight: PropTypes.number,
     cellWidth: PropTypes.number,
     leftMargin: PropTypes.number,

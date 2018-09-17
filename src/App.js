@@ -1,53 +1,45 @@
 import React, { Component } from 'react';
 import './App.css';
 import WeekWorkComponent from './components/WeekWorkComponent';
-import { WeekWork, Work, Task, Project } from './domain/WeekWork';
-import Log from './Log';
+import { ProjectManager, WeekWork } from './domain/WeekWork';
 import faker from 'faker';
 
+const projectManager = new ProjectManager(new WeekWork(new Date(2018, 6, 16)));
+
 faker.seed(1);
-let projects = [];
 for (let i = 0; i < 5; i++) {
-  const project = new Project(faker.random.word(), faker.lorem.words());
+  const projectId = faker.random.word();
+  projectManager.addProject(projectId, faker.lorem.words());
   for (let t = 0; t < 10; t++) {
-    const task = new Task(faker.random.word(), faker.lorem.words(), faker.internet.color());
-    project.addTask(task);
+    projectManager.addTask(projectId, faker.random.word(), faker.lorem.words(), faker.internet.color());
   }
-  projects.push(project);
 }
 
-const weekWork = new WeekWork(new Date(2018, 7, 20));
-weekWork.addWork(0, Work.valueOf(projects[0].tasks[0], 8, 9));
-weekWork.addWork(0, Work.valueOf(projects[0].tasks[1], 9, 11.25));
-weekWork.addWork(0, Work.valueOf(projects[1].tasks[0], 14, 18));
-weekWork.addWork(1, Work.valueOf(projects[0].tasks[0], 8, 18));
-weekWork.addWork(4, Work.valueOf(projects[0].tasks[0], 8, 9));
-weekWork.addWork(4, Work.valueOf(projects[0].tasks[1], 9, 11.25));
-weekWork.addWork(4, Work.valueOf(projects[1].tasks[0], 13, 18));
+let projectId = projectManager.projects[0].id;
+let tasks = projectManager.getTasks(projectId);
+projectManager.addWork(projectId, tasks[0].id, 0, 8, 9);
+projectManager.addWork(projectId, tasks[1].id, 0, 9, 11.25);
+projectManager.addWork(projectId, tasks[2].id, 0, 14, 18);
 
-const allTasks = [];
-projects.forEach(p => p.tasks.forEach(t => allTasks.push(t)));
+projectId = projectManager.projects[1].id;
+tasks = projectManager.getTasks(projectId);
+projectManager.addWork(projectId, tasks[1].id, 1, 9, 11.25);
+projectManager.addWork(projectId, tasks[2].id, 1, 14, 18);
 
-Log.trace(weekWork);
-Log.trace(allTasks);
+projectId = projectManager.projects[2].id;
+tasks = projectManager.getTasks(projectId);
+projectManager.addWork(projectId, tasks[0].id, 2, 9, 13);
+projectManager.addWork(projectId, tasks[1].id, 2, 14, 18);
+
+projectId = projectManager.projects[3].id;
+tasks = projectManager.getTasks(projectId);
+projectManager.addWork(projectId, tasks[0].id, 3, 9, 18);
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      showTaskSearch: false
-    };
-  }
-  closeTaskSelector = () => {
-    this.setState({ showTaskSearch: false });
-  }
-  openTaskSelector = () => {
-    this.setState({ showTaskSearch: true });
-  }
   render() {
     return (
       <div className="App">
-        <WeekWorkComponent weekWork={weekWork} tasks={allTasks} />
+        <WeekWorkComponent projectManager={projectManager} />
       </div>
     );
   }

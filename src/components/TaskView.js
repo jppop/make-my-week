@@ -11,6 +11,7 @@ import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const styles = (theme: Object) => ({
   root: {
@@ -78,13 +79,44 @@ function ActionsIcons(props) {
     </Tooltip>
   ];
 }
+const TaskCompletion = () => {
+  const completion = Math.random() * 100;
+  const completionPercent = parseFloat(completion).toFixed(2);
+  return (
+    <div>
+      <Typography variant="caption">completion: {completionPercent}%</Typography>
+      <LinearProgress variant="determinate" value={completion} />
+    </div>
+  );
+};
 
 const WorkDetails = props => {
-  const { classes } = props; // eslint-disable-line react/prop-types
+  const { classes, work } = props; // eslint-disable-line react/prop-types
   return (
     <Grid container className={classes.workDetail} spacing={0}>
       <Grid item xs={12}>
-        <Typography component="p">any comment here</Typography>
+        <TaskCompletion />
+        <Grid container spacing={0} alignContent="flex-end">
+          <Grid item xs={2}>
+            <Typography variant="body1">Planned:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">4 days</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">Done:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body1">2.5 days</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body2">To be done:</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="body2">2.5 days</Typography>
+          </Grid>
+        </Grid>
+        <Typography component="p">hard-coded data</Typography>
       </Grid>
     </Grid>
   );
@@ -98,7 +130,7 @@ const timelineInfo = (work: Work): string => {
   const hour = Math.trunc(duration);
   const minutes = (duration - hour) * 60;
   const durationAsString = hour.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-  return `${day}, ${start} - ${end} (${durationAsString})`;
+  return `${day} : ${start} - ${end} (${durationAsString})`;
 };
 
 class WorkTimeline extends React.Component<ProvidedProps & Props> {

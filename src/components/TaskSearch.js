@@ -4,7 +4,7 @@ import { Task } from '../domain/WeekWork';
 import Log from '../Log';
 
 type Props = {
-  tasks: Task[],
+  tasks: () => Task[],
   x: number,
   y: number,
   showing: boolean,
@@ -82,9 +82,12 @@ export default class TaskSearch extends React.Component<Props, State> {
   }
   render() {
     const { showing, x, y } = this.props;
+    let shownTasks: Task[] = [];
     if (showing) {
       document.addEventListener('keydown', this._onKeyPress, false);
       Log.trace(this.textInput, 'TaskSearch::render');
+      const filter = this.state.filter.toLowerCase();
+      shownTasks = this._getTasks(filter);
     } else {
       document.removeEventListener('keydown', this._onKeyPress, false);
     }
@@ -123,8 +126,29 @@ export default class TaskSearch extends React.Component<Props, State> {
         x
       </span>
     );
-    const filter = this.state.filter.toLowerCase();
-    const shownTasks = this.props.tasks.filter(task => {
+
+    const taskList = shownTasks.map(task => {
+      return (
+        <li key={task.projectId + ':' + task.id}>
+          <span style={{ cursor: 'pointer' }} onClick={e => this._onSelectTask(e, task)}>
+            {task.projectId} - {task.label}
+          </span>
+        </li>
+      );
+    });
+    return (
+      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }} onClick={e => e.stopPropagation()}>
+        {searchInput}
+        {closeButton}
+        <div style={styles.taskContainer}>
+          <ul style={styles.tasks}>{taskList}</ul>
+        </div>
+      </div>
+    );
+  }
+
+  _getTasks = (filter: string): Task[] => {
+    const shownTasks = this.props.tasks().filter(task => {
       const words = filter.split(' ').filter(Boolean);
       if (words.length > 1) {
         // search on project and task label
@@ -140,24 +164,6 @@ export default class TaskSearch extends React.Component<Props, State> {
         task.label.toLowerCase().indexOf(anyFilter) !== -1 || task.projectId.toLowerCase().indexOf(anyFilter) !== -1
       );
     });
-
-    const tasks = shownTasks.map(task => {
-      return (
-        <li key={task.projectId + ':' + task.id}>
-          <span style={{ cursor: 'pointer' }} onClick={e => this._onSelectTask(e, task)}>
-            {task.projectId} - {task.label}
-          </span>
-        </li>
-      );
-    });
-    return (
-      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }} onClick={e => e.stopPropagation()}>
-        {searchInput}
-        {closeButton}
-        <div style={styles.taskContainer}>
-          <ul style={styles.tasks}>{tasks}</ul>
-        </div>
-      </div>
-    );
+    return shownTasks;
   }
 }

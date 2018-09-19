@@ -69,6 +69,7 @@ function ActionsIcons(props) {
         classes={{
           root: classes.actionButton
         }}
+        style={{ marginRight: 5 }}
         color="secondary"
         size="small"
         aria-label="Delete work"

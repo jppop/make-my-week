@@ -1,5 +1,6 @@
 import { ProjectManager, WeekWork, Work, Task, Project } from './WeekWork';
 import faker from 'faker';
+import { completeAssign } from '../utils/tools';
 
 describe('work adjustments', () => {
   let projectManager = null;
@@ -44,11 +45,11 @@ describe('work adjustments', () => {
     const tasks = projectManager.getTasks(projectId);
     let expectedDuration = tasks[0].completed;
     let work;
-    work = projectManager.addWork(projectId, tasks[0].id, 0, 8, 9);
+    work = projectManager.addWork(projectId, tasks[0].id, 2, 8, 9);
     expectedDuration += work.duration(true);
-    work = projectManager.addWork(projectId, tasks[0].id, 0, 9, 11.25);
+    work = projectManager.addWork(projectId, tasks[0].id, 2, 9, 11.25);
     expectedDuration += work.duration(true);
-    work = projectManager.addWork(projectId, tasks[0].id, 0, 15, 18);
+    work = projectManager.addWork(projectId, tasks[0].id, 2, 15, 18);
     expectedDuration += work.duration(true);
 
     expect(expectedDuration).toBe(tasks[0].completed);
@@ -65,5 +66,21 @@ describe('work adjustments', () => {
     expectedDuration -= work.duration(true);
     projectManager.deleteWork(work.id.work);
     expect(expectedDuration).toBe(tasks[0].completed);
+  });
+
+  test('should be cloned', () => {
+    const workA = new Work('P1', 'T01', 'W01', 8, 12, 'Task #01', 'blue');
+    const startTime = workA.startTime;
+    // console.log(workA);
+    // console.log(startTime);
+    const workB = workA.clone();
+    startTime.setDate(startTime.getDate() + 1);
+    // console.log(workA);
+    // console.log(startTime);
+    // console.log(workB);
+    expect(workA).not.toBe(workB);
+    expect(workA).toEqual(workB);
+    expect(workA.startTime).not.toEqual(startTime);
+    expect(workB.startTime).not.toEqual(startTime);
   });
 });

@@ -309,7 +309,7 @@ export default class WeekWorkGrid extends Component {
       });
     };
 
-    const boundStyle = this.styles.bounds(this.props.works.length);
+    const boundStyle = this.styles.bounds(settings.daysPerWeek);
 
     return (
       <div style={this.styles.container}>

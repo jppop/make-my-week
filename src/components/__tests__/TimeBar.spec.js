@@ -75,7 +75,7 @@ describe('rendering', () => {
   test('bar is rendered with the work duration and color', () => {
     let task = project.getTask('T01');
     expect(task).not.toBeNull();
-    let workItem = Work.valueOf(task, 9, 18);
+    let workItem = Work.fromTask(task, 9, 18);
     const wrapper = mount(
       Fixture({
         workItem: workItem
@@ -99,7 +99,7 @@ describe('event', () => {
   xtest('bar call drag callbacks', () => {
     let task = project.getTask('T01');
     expect(task).not.toBeNull();
-    let workItem = Work.valueOf(task, 9, 18);
+    let workItem = Work.fromTask(task, 9, 18);
     const dragStartSpy = jest.fn();
     const dragStopSpy = jest.fn();
     const onWorkItemUpdateSpy = jest.fn();
@@ -122,7 +122,7 @@ describe('event', () => {
   test('bar call contextmenu callbacks', () => {
     let task = project.getTask('T01');
     expect(task).not.toBeNull();
-    let workItem = Work.valueOf(task, 9, 18);
+    let workItem = Work.fromTask(task, 9, 18);
     const contextMenuHandlerSpy = jest.fn();
     const wrapper = mount(
       Fixture({

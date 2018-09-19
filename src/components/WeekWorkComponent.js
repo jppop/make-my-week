@@ -43,24 +43,24 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
   }
 
   addWorkItem = (task: Task, dayIndex: number, start: number, end: number): void => {
-    const newWeekworks = this.props.projectManager.addWork(task.projectId, task.id, dayIndex, start, end);
+    this.props.projectManager.addWork(task.projectId, task.id, dayIndex, start, end);
 
     this.setState({
-      works: newWeekworks
+      works: this.props.projectManager.getWorks()
     });
   }
 
   onRemoveWorkItem = (workItem: Work): void => {
-    const newWeekWorks = this.props.projectManager.deleteWork(workItem.id.work);
+    this.props.projectManager.deleteWork(workItem.id.work);
     this.setState({
-      works: newWeekWorks
+      works: this.props.projectManager.getWorks()
     });
   }
 
   onWorkItemUpdate = (workItem: Work): void => {
-    const newWeekWorks = this.props.projectManager.updateWork(workItem);
+    this.props.projectManager.updateWork(workItem);
     this.setState({
-      works: newWeekWorks
+      works: this.props.projectManager.getWorks()
     });
   }
 }

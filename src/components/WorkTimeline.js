@@ -46,11 +46,12 @@ type ProvidedProps = {
 
 type Props = {
   classes: Object,
-  works: Work[]
+  works: Work[],
+  onDelete: (work: Work) => void
 }
 
 function ActionsIcons(props) {
-  const { classes, keyBase } = props;
+  const { classes, keyBase, deleteActionHandler } = props;
   return [
     <Tooltip key={keyBase + '-action-edit'} title="Edit work">
       <IconButton
@@ -73,6 +74,7 @@ function ActionsIcons(props) {
         color="secondary"
         size="small"
         aria-label="Delete work"
+        onClick={deleteActionHandler}
       >
         <DeleteIcon className={classes.actionIcon} />
       </IconButton>
@@ -104,7 +106,7 @@ const timelineInfo = (work: Work): string => {
 
 class WorkTimeline extends React.Component<ProvidedProps & Props> {
   render() {
-    const { classes, works } = this.props;
+    const { classes, works, onDelete } = this.props;
 
     const workItems = works.map(work => {
       return (
@@ -114,7 +116,7 @@ class WorkTimeline extends React.Component<ProvidedProps & Props> {
           createdAt={timelineInfo(work)}
           icon={<Icon>donut_large</Icon>}
           iconColor="darkgrey"
-          buttons={<ActionsIcons classes={classes} keyBase={work.id.work} />}
+          buttons={<ActionsIcons classes={classes} keyBase={work.id.work} deleteActionHandler={() => onDelete(work)} />}
           bubbleStyle={{ backgroundColor: work.color }}
         >
           <WorkDetails work={work} classes={classes} />

@@ -417,8 +417,14 @@ export class ProjectManager {
   }
 
   updateWork = (workItem: Work): Work => {
-    this.deleteWork(workItem.id.work);
-    return this.addWork(workItem.id.project, workItem.id.task, workItem.dayIndex, workItem.start, workItem.end);
+    const currentWorks = this.weekWork.works;
+    try {
+      this.deleteWork(workItem.id.work);
+      return this.addWork(workItem.id.project, workItem.id.task, workItem.dayIndex, workItem.start, workItem.end);
+    } catch (e) {
+      this.weekWork.works = currentWorks;
+      throw e;
+    }
   }
 
   getWorks = (): Work[] => {

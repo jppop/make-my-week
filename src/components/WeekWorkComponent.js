@@ -3,6 +3,7 @@ import * as React from 'react';
 import WorkTimeline from './WorkTimeline';
 import { ProjectManager, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';
+import Log from '../Log';
 
 type Props = {
   projectManager: ProjectManager
@@ -36,29 +37,40 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
           updateWorkItemHandler={this.onWorkItemUpdate}
         />
         <div style={{ textAlign: 'left' }}>
-          <WorkTimeline works={works} />
+          <WorkTimeline works={works} onDelete={this.onRemoveWorkItem} />
         </div>
       </div>
     );
   }
 
   addWorkItem = (task: Task, dayIndex: number, start: number, end: number): void => {
-    this.props.projectManager.addWork(task.projectId, task.id, dayIndex, start, end);
-
+    try {
+      this.props.projectManager.addWork(task.projectId, task.id, dayIndex, start, end);
+    } catch (e) {
+      Log.trace(e, 'WeekWorkComponent::addWorkItem');
+    }
     this.setState({
       works: this.props.projectManager.getWorks()
     });
   }
 
   onRemoveWorkItem = (workItem: Work): void => {
-    this.props.projectManager.deleteWork(workItem.id.work);
+    try {
+      this.props.projectManager.deleteWork(workItem.id.work);
+    } catch (e) {
+      Log.trace(e, 'WeekWorkComponent::onRemoveWorkItem');
+    }
     this.setState({
       works: this.props.projectManager.getWorks()
     });
   }
 
   onWorkItemUpdate = (workItem: Work): void => {
-    this.props.projectManager.updateWork(workItem);
+    try {
+      this.props.projectManager.updateWork(workItem);
+    } catch (e) {
+      Log.trace(e, 'WeekWorkComponent::onWorkItemUpdate');
+    }
     this.setState({
       works: this.props.projectManager.getWorks()
     });

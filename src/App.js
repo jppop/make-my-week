@@ -1,8 +1,21 @@
-import React, { Component } from 'react';
+// @flow
+
+import * as React from 'react';
+import withRoot from './withRoot';
 import './App.css';
 import WeekWorkComponent from './components/WeekWorkComponent';
 import { ProjectManager, WeekWork } from './domain/WeekWork';
 import faker from 'faker';
+import { withStyles } from '@material-ui/core';
+import TaskSearch from './components/TaskSearch.mui';
+
+const styles = (theme: Object) => ({
+  root: {}
+});
+
+type ProvidedProps = {
+  classes: Object
+}
 
 const projectManager = new ProjectManager(new WeekWork(new Date(2018, 6, 16)));
 
@@ -35,14 +48,15 @@ projectId = projectManager.projects[3].id;
 tasks = projectManager.getTasks(projectId);
 projectManager.addWork(projectId, tasks[0].id, 3, 9, 18);
 
-class App extends Component {
+class App extends React.Component<ProvidedProps> {
   render() {
     return (
       <div className="App">
+        <TaskSearch projectManager={projectManager} />
         <WeekWorkComponent projectManager={projectManager} />
       </div>
     );
   }
 }
 
-export default App;
+export default withRoot(withStyles(styles)(App));

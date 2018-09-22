@@ -2,61 +2,8 @@
 import * as React from 'react';
 import { Task } from '../domain/WeekWork';
 import Log from '../Log';
-import { withStyles } from '@material-ui/core';
 
-const selectorHeight = 100;
-
-const styles = (theme: Object) => ({
-  root: {
-    position: 'relative',
-    zIndex: theme.zIndex.snackbar
-  },
-  scrollContainer: {
-    position: 'relative',
-    backgroundColor: theme.palette.background.paper,
-    fontSize: theme.typography.body1.fontSize,
-    width: 350,
-    height: selectorHeight,
-    marginBottom: theme.spacing.unit * 3,
-    zIndex: theme.zIndex.snackbar
-  },
-  scroll: {
-    position: 'relative',
-    width: '100%',
-    height: '100%'
-  },
-  taskContainer: {
-    overflow: 'auto',
-    width: 350,
-    height: selectorHeight - 40,
-    zIndex: 'inherit',
-    position: 'relative'
-  },
-  tasks: { position: 'relative', zIndex: 'inherit', textAlign: 'left', margin: 0, paddingLeft: 20, listStyle: 'none' },
-  xStyle: {
-    color: theme.palette.action.disabled,
-    fontSize: theme.typography.fontSize,
-    cursor: 'pointer',
-    float: 'right',
-    marginTop: '-32px',
-    marginRight: '5px',
-    '&:hover': {
-      color: theme.palette.primary.main
-    }
-  },
-  input: {
-    margin: 10,
-    width: '85%',
-    borderRadius: 5,
-    border: `1px solid ${theme.palette.background.paper}`
-  }
-});
-
-type ProvidedProps = {
-  classes: Object
-}
 type Props = {
-  classes: Object,
   tasks: () => Task[],
   x: number,
   y: number,
@@ -70,10 +17,30 @@ type State = {
   xHovered: boolean
 }
 
-class TaskSearch extends React.Component<ProvidedProps & Props, State> {
+const selectorHeight = 100;
+const styles = {
+  selectorStyle: (x, y) => {
+    return {
+      boxShadow: '0 6px 8px 0 rgba(0, 0, 0, 0.24)',
+      backgroundColor: '#fff',
+      width: 350,
+      height: selectorHeight,
+      position: 'relative',
+      fontSize: 11,
+      left: x,
+      top: y,
+      cursor: 'auto',
+      zIndex: 2100
+    };
+  },
+  taskContainer: { width: 350, height: selectorHeight - 40, overflow: 'auto', zIndex: 2100, position: 'relative' },
+  tasks: { textAlign: 'left', margin: 0, paddingLeft: 20, listStyle: 'none' }
+};
+
+export default class TaskSearch extends React.Component<Props, State> {
   textInput: ?HTMLInputElement
 
-  constructor(props: ProvidedProps & Props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       filter: '',
@@ -114,22 +81,31 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     }
   }
   render() {
-    Log.trace(this.textInput, 'TaskSearch::render');
-
-    if (!this.props.showing) {
-      document.removeEventListener('keydown', this._onKeyPress, false);
-      return <div style={{ display: 'none' }} />;
-    }
-    document.addEventListener('keydown', this._onKeyPress, false);
-
-    const { x, y, classes } = this.props;
+    const { showing, x, y } = this.props;
     let shownTasks: Task[] = [];
-    const filter = this.state.filter.toLowerCase();
-    shownTasks = this._getTasks(filter);
+    if (showing) {
+      document.addEventListener('keydown', this._onKeyPress, false);
+      Log.trace(this.textInput, 'TaskSearch::render');
+      const filter = this.state.filter.toLowerCase();
+      shownTasks = this._getTasks(filter);
+    } else {
+      document.removeEventListener('keydown', this._onKeyPress, false);
+    }
+    let xStyle = {
+      color: '#E8E8E8',
+      fontSize: '20px',
+      cursor: 'pointer',
+      float: 'right',
+      marginTop: '-32px',
+      marginRight: '5px'
+    };
+    if (this.state.xHovered) {
+      xStyle.color = '#4fb0fc';
+    }
     const searchInput = (
       <div>
         <input
-          className={classes.input}
+          style={{ margin: 10, width: '85%', borderRadius: 5, border: '1px solid #E8E8E8' }}
           type="text"
           placeholder="Search"
           value={this.state.filter}
@@ -142,7 +118,7 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     );
     const closeButton = (
       <span
-        className={classes.xStyle}
+        style={xStyle}
         onClick={this._close}
         onMouseEnter={() => this.setState({ xHovered: true })}
         onMouseLeave={() => this.setState({ xHovered: false })}
@@ -161,13 +137,11 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
       );
     });
     return (
-      <div className={classes.root} style={{ left: x, top: y }} onClick={e => e.stopPropagation()}>
-        <div className={classes.scrollContainer}>
-          {searchInput}
-          {closeButton}
-          <div className={classes.taskContainer}>
-            <ul className={classes.tasks}>{taskList}</ul>
-          </div>
+      <div style={showing ? styles.selectorStyle(x, y) : { display: 'none' }} onClick={e => e.stopPropagation()}>
+        {searchInput}
+        {closeButton}
+        <div style={styles.taskContainer}>
+          <ul style={styles.tasks}>{taskList}</ul>
         </div>
       </div>
     );
@@ -193,5 +167,3 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     return shownTasks;
   }
 }
-
-export default withStyles(styles)(TaskSearch);

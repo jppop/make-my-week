@@ -6,10 +6,16 @@ import TaskSearch from './TaskSearch';
 import moment from 'moment';
 import { Work } from '../domain/WeekWork';
 import Log from '../Log';
+import { withStyles } from '@material-ui/core';
 
 const QUATER_WIDTH = 16;
+const ZINDEX_BASE = 0;
 
-export default class WeekWorkGrid extends Component {
+const styles = (theme) => ({
+  root: {}
+});
+
+class WeekWorkGrid extends Component {
   static propTypes = {
     works: PropTypes.arrayOf(PropTypes.instanceOf(Work)).isRequired,
     settings: PropTypes.object.isRequired,
@@ -49,7 +55,7 @@ export default class WeekWorkGrid extends Component {
         fontFamily: '\'Roboto\', sans-serif',
         fontSize: 12,
         boxSizing: 'content-box',
-        zIndex: 0,
+        zIndex: ZINDEX_BASE,
         WebkitFontSmoothing: 'auto'
       },
 
@@ -169,7 +175,7 @@ export default class WeekWorkGrid extends Component {
           maxHeight: (this.props.cellHeight + 2) * lines - 2,
           width: (this.props.cellWidth + 2) * (settings.endTime - settings.startTime) - 1,
           maxWidth: (this.props.cellWidth + 2) * (settings.endTime - settings.startTime) - 1,
-          zIndex: 2,
+          zIndex: ZINDEX_BASE + 2,
           pointerEvents: 'auto',
           cursor: 'crosshair'
         };
@@ -405,3 +411,5 @@ export default class WeekWorkGrid extends Component {
     });
   }
 }
+
+export default withStyles(styles)(WeekWorkGrid);

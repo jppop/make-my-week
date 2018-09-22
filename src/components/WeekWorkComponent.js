@@ -4,41 +4,88 @@ import WorkTimeline from './WorkTimeline';
 import { ProjectManager, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
+import { Grid, withStyles } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+import Select from 'react-select';
 
+const styles = (theme: Object) => ({
+  root: {},
+  weekWorkContainer: {
+    maxWidth: 720
+  },
+  weekWork: {},
+  timeline: {}
+});
+
+type ProvidedProps = {
+  classes: Object
+}
 type Props = {
+  classes: Object,
   projectManager: ProjectManager
 }
 type State = {
   works: Work[],
   startDay: Date
 }
+type OptionType = {
+  [string]: any
+}
 
-export default class WeekWorkComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
+type OptionsType = Array<OptionType>
+
+type GroupType = {
+  options: OptionsType,
+  [string]: any
+}
+
+class WeekWorkComponent extends React.Component<ProvidedProps & Props, State> {
+  options: Array<GroupType>
+
+  constructor(props: ProvidedProps & Props) {
     super(props);
     this.state = {
       works: this.props.projectManager.weekWork.works,
       startDay: this.props.projectManager.weekWork.day
     };
+    const options = props.projectManager.projects.map(p => {
+      const taskOptions = p.tasks.map(t => {
+        return { value: t.id, label: t.label };
+      });
+      const options = {
+        label: p.id,
+        options: taskOptions
+      };
+      return options;
+    });
+    this.options = options;
   }
   render() {
+    const { classes } = this.props;
     const { works, startDay } = this.state;
     const { settings } = this.props.projectManager.weekWork;
 
     return (
-      <div>
-        <WeekWorkGrid
-          works={works}
-          startDay={startDay}
-          settings={settings}
-          tasks={() => this.props.projectManager.getAllTasks()}
-          addWorkItemHandler={this.addWorkItem}
-          removeWorkItemHandler={this.onRemoveWorkItem}
-          updateWorkItemHandler={this.onWorkItemUpdate}
-        />
-        <div style={{ textAlign: 'left' }}>
-          <WorkTimeline works={works} onDelete={this.onRemoveWorkItem} />
-        </div>
+      <div className={classes.root}>
+        <Grid container className={classes.weekWorkContainer} justify="center">
+          <Grid item xs={12}>
+            <Typography variant="subheading">{startDay.toDateString()}</Typography>
+          </Grid>
+          <Grid item xs={12} className={classes.weekWork}>
+            <WeekWorkGrid
+              works={works}
+              startDay={startDay}
+              settings={settings}
+              tasks={() => this.props.projectManager.getAllTasks()}
+              addWorkItemHandler={this.addWorkItem}
+              removeWorkItemHandler={this.onRemoveWorkItem}
+              updateWorkItemHandler={this.onWorkItemUpdate}
+            />
+          </Grid>
+          <Grid item xs={12} className={classes.timeline}>
+            <WorkTimeline works={works} onDelete={this.onRemoveWorkItem} />
+          </Grid>
+        </Grid>
       </div>
     );
   }
@@ -76,3 +123,4 @@ export default class WeekWorkComponent extends React.Component<Props, State> {
     });
   }
 }
+export default withStyles(styles)(WeekWorkComponent);

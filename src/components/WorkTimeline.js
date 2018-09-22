@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Timeline, TimelineEvent } from 'react-event-timeline';
 import { Work } from '../domain/WeekWork';
 import moment from 'moment';
-import withRoot from '../withRoot';
 import { withStyles, Grid } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -20,22 +19,22 @@ const styles = (theme: Object) => ({
     maxWidth: 700,
     overflow: 'auto',
     maxHeight: 700,
-    zIndex: theme.zIndex.appBar,
+    // zIndex: theme.zIndex.appBar,
     position: 'relative',
     flexGrow: 1
   },
   timeline: {
-    zIndex: theme.zIndex.appBar
+    // zIndex: theme.zIndex.appBar
   },
   actionButton: {
     height: 20,
-    width: 20,
-    zIndex: theme.zIndex.appBar
+    width: 20
+    // zIndex: theme.zIndex.appBar
   },
   actionIcon: {
     height: 16,
-    width: 16,
-    zIndex: theme.zIndex.appBar
+    width: 16
+    // zIndex: theme.zIndex.appBar
   },
   workDetail: {}
 });
@@ -130,4 +129,4 @@ class WorkTimeline extends React.Component<ProvidedProps & Props> {
     );
   }
 }
-export default withRoot(withStyles(styles)(WorkTimeline));
+export default withStyles(styles)(WorkTimeline);

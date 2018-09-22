@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Timeline, TimelineEvent } from 'react-event-timeline';
 import { Work } from '../domain/WeekWork';
 import moment from 'moment';
-import withRoot from '../withRoot';
 import { withStyles, Grid } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -159,4 +158,4 @@ class WorkTimeline extends React.Component<ProvidedProps & Props> {
     );
   }
 }
-export default withRoot(withStyles(styles)(WorkTimeline));
+export default withStyles(styles)(WorkTimeline);

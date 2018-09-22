@@ -3,6 +3,10 @@ import * as React from 'react';
 import { Task } from '../domain/WeekWork';
 import Log from '../Log';
 import { withStyles } from '@material-ui/core';
+import Popover from '@material-ui/core/Popover';
+import TextField from '@material-ui/core/TextField';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Paper from '@material-ui/core/Paper';
 
 const selectorHeight = 100;
 
@@ -16,7 +20,7 @@ const styles = (theme: Object) => ({
     backgroundColor: theme.palette.background.paper,
     fontSize: theme.typography.body1.fontSize,
     width: 350,
-    height: selectorHeight,
+    // height: selectorHeight,
     marginBottom: theme.spacing.unit * 3,
     zIndex: theme.zIndex.snackbar
   },
@@ -28,27 +32,29 @@ const styles = (theme: Object) => ({
   taskContainer: {
     overflow: 'auto',
     width: 350,
-    height: selectorHeight - 40,
+    height: selectorHeight,
     zIndex: 'inherit',
     position: 'relative'
   },
   tasks: { position: 'relative', zIndex: 'inherit', textAlign: 'left', margin: 0, paddingLeft: 20, listStyle: 'none' },
   xStyle: {
     color: theme.palette.action.disabled,
-    fontSize: theme.typography.fontSize,
+    // fontSize: theme.typography.fontSize,
     cursor: 'pointer',
     float: 'right',
-    marginTop: '-32px',
-    marginRight: '5px',
+    marginTop: '-60px',
+    marginRight: '8px',
     '&:hover': {
       color: theme.palette.primary.main
     }
   },
   input: {
-    margin: 10,
-    width: '85%',
-    borderRadius: 5,
-    border: `1px solid ${theme.palette.background.paper}`
+    // fontSize: theme.typography.body1.fontSize,
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+    width: '85%'
+    // borderRadius: theme.shape.borderRadius,
+    // border: `1px solid ${theme.palette.primary.main}`
   }
 });
 
@@ -101,9 +107,10 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
   }
 
   componentDidUpdate() {
-    // Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
+    Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
 
     if (this.textInput) {
+      Log.trace('give focus', 'TaskSearch::componentDidUpdate');
       this.textInput.focus();
     }
   }
@@ -128,13 +135,25 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     shownTasks = this._getTasks(filter);
     const searchInput = (
       <div>
-        <input
+        {/* <input
           className={classes.input}
           type="text"
           placeholder="Search"
           value={this.state.filter}
           onChange={e => this.setState({ filter: e.target.value })}
           ref={input => {
+            this.textInput = input;
+          }}
+        /> */}
+        <TextField
+          autoFocus
+          label="Select task"
+          type="search"
+          className={classes.input}
+          margin="normal"
+          value={this.state.filter}
+          onChange={e => this.setState({ filter: e.target.value })}
+          inputRef={input => {
             this.textInput = input;
           }}
         />
@@ -161,14 +180,32 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
       );
     });
     return (
-      <div className={classes.root} style={{ left: x, top: y }} onClick={e => e.stopPropagation()}>
-        <div className={classes.scrollContainer}>
-          {searchInput}
-          {closeButton}
-          <div className={classes.taskContainer}>
-            <ul className={classes.tasks}>{taskList}</ul>
-          </div>
-        </div>
+      <div className={classes.root} onClick={e => e.stopPropagation()}>
+        <Popover
+          open
+          anchorReference="anchorPosition"
+          anchorPosition={{ top: y, left: x }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+        >
+          <Paper className={classes.scrollContainer}>
+            <ClickAwayListener onClickAway={this._close}>
+              <div>
+                {searchInput}
+                {closeButton}
+                <div className={classes.taskContainer}>
+                  <ul className={classes.tasks}>{taskList}</ul>
+                </div>
+              </div>
+            </ClickAwayListener>
+          </Paper>
+        </Popover>
       </div>
     );
   }

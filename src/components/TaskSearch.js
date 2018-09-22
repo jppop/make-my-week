@@ -212,7 +212,7 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
 
   _getTasks = (filter: string): Task[] => {
     const shownTasks = this.props.tasks().filter(task => {
-      const words = filter.split(' ').filter(Boolean);
+      const words = filter.split(' ');
       if (words.length > 1) {
         // search on project and task label
         const projectFilter = words[0];

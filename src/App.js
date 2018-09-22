@@ -7,7 +7,6 @@ import WeekWorkComponent from './components/WeekWorkComponent';
 import { ProjectManager, WeekWork } from './domain/WeekWork';
 import faker from 'faker';
 import { withStyles } from '@material-ui/core';
-import TaskSearch from './components/TaskSearch.mui';
 
 const styles = (theme: Object) => ({
   root: {}
@@ -52,7 +51,6 @@ class App extends React.Component<ProvidedProps> {
   render() {
     return (
       <div className="App">
-        <TaskSearch projectManager={projectManager} />
         <WeekWorkComponent projectManager={projectManager} />
       </div>
     );

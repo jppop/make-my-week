@@ -19,22 +19,17 @@ const styles = (theme: Object) => ({
     maxWidth: 700,
     overflow: 'auto',
     maxHeight: 700,
-    // zIndex: theme.zIndex.appBar,
     position: 'relative',
     flexGrow: 1
   },
-  timeline: {
-    // zIndex: theme.zIndex.appBar
-  },
+  timeline: {},
   actionButton: {
     height: 20,
     width: 20
-    // zIndex: theme.zIndex.appBar
   },
   actionIcon: {
     height: 16,
     width: 16
-    // zIndex: theme.zIndex.appBar
   },
   workDetail: {}
 });

@@ -6,7 +6,6 @@ import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
 import { Grid, withStyles } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
-import Select from 'react-select';
 
 const styles = (theme: Object) => ({
   root: {},

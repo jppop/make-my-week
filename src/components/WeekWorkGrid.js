@@ -7,13 +7,16 @@ import moment from 'moment';
 import { Work } from '../domain/WeekWork';
 import Log from '../Log';
 import { withStyles } from '@material-ui/core';
+import { toClass } from 'recompose';
 
 const QUATER_WIDTH = 16;
 const ZINDEX_BASE = 0;
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {}
 });
+
+const gridCellKey = (dayIndex, cell) => `grid-cell-${dayIndex}x${cell}`;
 
 class WeekWorkGrid extends Component {
   static propTypes = {
@@ -44,7 +47,8 @@ class WeekWorkGrid extends Component {
 
     this.state = {
       showTaskSearch: false,
-      taskSearchPosition: { x: 0, y: 0 }
+      anchorEL: null,
+      callBack: () => {}
     };
 
     this.bounds = React.createRef();
@@ -192,13 +196,19 @@ class WeekWorkGrid extends Component {
     const { settings } = this.props;
     Log.trace(settings, 'WeekWorkGrid::render');
 
-    const GridCell = props => {
+    this._gridCells = [];
+
+    const GridCell = toClass(props => {
       return (
-        <div id={props.id} style={this.styles.gridCell(props.isFirstChild, props.isLastChild, props.lunchTime)}>
+        <div
+          id={props.id}
+          style={this.styles.gridCell(props.isFirstChild, props.isLastChild, props.lunchTime)}
+          ref={el => {if (el) {this._gridCells[el.id] = el;}}}
+        >
           {props.children}
         </div>
       );
-    };
+    });
 
     const DayGrid = props => {
       let cells = [];
@@ -207,10 +217,11 @@ class WeekWorkGrid extends Component {
       const cellLunchTimeEnd = props.end - props.lunchTimeEnd + 1;
       const day = moment(props.day).format('dd DD');
       for (let cell = 0; cell < cellCount; cell++) {
+        const key = gridCellKey(props.dayIndex, cell);
         cells.push(
           <GridCell
-            key={'grid-cell#' + cell.toString()}
-            id={'grid-cell#' + cell.toString()}
+            key={key}
+            id={key}
             isFirstChild={cell === 0}
             isLastChild={cell === cellCount - 1}
             lunchTime={cellLunchTimeStart <= cell && cell <= cellLunchTimeEnd}
@@ -236,6 +247,7 @@ class WeekWorkGrid extends Component {
         grid.push(
           <DayGrid
             key={'day-grid#' + dayIndex}
+            dayIndex={dayIndex}
             day={day}
             start={startTime}
             end={endTime}
@@ -341,11 +353,10 @@ class WeekWorkGrid extends Component {
               onSelectTask={task => {
                 Log.trace(task);
                 this.setState({ showTaskSearch: false });
-                this._addWorkItem(task);
+                this.state.callBack(task);
               }}
               showing={this.state.showTaskSearch}
-              x={this.state.taskSearchPosition.x}
-              y={this.state.taskSearchPosition.y}
+              anchorEl={this.state.anchorEl}
             />
           </div>
         </div>
@@ -371,6 +382,7 @@ class WeekWorkGrid extends Component {
     const { startTime, defaultWorkDuration } = this.props.settings;
 
     const boundingRect = ReactDOM.findDOMNode(this.bounds.current).getBoundingClientRect(); // eslint-disable-line react/no-find-dom-node
+    Log.trace(boundingRect, 'WeekWorkGrid::_onAddWorkItem');
     const { clientX, clientY } = e;
     let start = startTime + Math.trunc((clientX - boundingRect.x) / (this.props.cellWidth + 2));
 
@@ -382,14 +394,24 @@ class WeekWorkGrid extends Component {
       endTime: start + defaultWorkDuration,
       dayIndex: dayIndex
     };
-    // Log.trace(`grid position : (${start}, ${dayIndex})`);
+    Log.trace(`grid position: (${start}, ${dayIndex})`, 'WeekWorkGrid::_onAddWorkItem');
+    const gridCellId = gridCellKey(dayIndex, start - startTime + 1);
+    Log.trace(`grid cell id: ${gridCellId}`, 'WeekWorkGrid::_onAddWorkItem');
+    const gridCell = this._gridCells[gridCellId];
+    Log.trace(gridCell, 'WeekWorkGrid::_onAddWorkItem');
+    Log.trace(gridCell.getBoundingClientRect(), 'WeekWorkGrid::_onAddWorkItem');
 
     // open the task selector
-    this._openTaskSelector(offsetX, offsetY);
+    const newWorkInfo = {
+      startTime: start,
+      endTime: start + defaultWorkDuration,
+      dayIndex: dayIndex
+    };
+    this._openTaskSelector(gridCell, (task) => this._addWorkItem(task, newWorkInfo));
   }
 
-  _addWorkItem = task => {
-    const { startTime, endTime, dayIndex } = this.newWorkItem;
+  _addWorkItem = (task, newWorkInfo) => {
+    const { startTime, endTime, dayIndex } = newWorkInfo;
     this.props.addWorkItemHandler(task, dayIndex, startTime, endTime);
   }
 
@@ -404,10 +426,11 @@ class WeekWorkGrid extends Component {
   _closeTaskSelector = () => {
     this.setState({ showTaskSearch: false });
   }
-  _openTaskSelector = (x, y) => {
+  _openTaskSelector = (anchorEl, callBack) => {
     this.setState({
       showTaskSearch: true,
-      taskSearchPosition: { x: x, y: y }
+      anchorEl: anchorEl,
+      callBack: callBack
     });
   }
 }

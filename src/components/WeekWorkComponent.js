@@ -25,7 +25,8 @@ type Props = {
 }
 type State = {
   works: Work[],
-  startDay: Date
+  startDay: Date,
+  endDay: Date
 }
 type OptionType = {
   [string]: any
@@ -45,23 +46,24 @@ class WeekWorkComponent extends React.Component<ProvidedProps & Props, State> {
     super(props);
     this.state = {
       works: this.props.projectManager.weekWork.works,
-      startDay: this.props.projectManager.weekWork.day
+      startDay: this.props.projectManager.weekWork.startDay,
+      endDay: this.props.projectManager.weekWork.endDay
     };
-    const options = props.projectManager.projects.map(p => {
-      const taskOptions = p.tasks.map(t => {
-        return { value: t.id, label: t.label };
-      });
-      const options = {
-        label: p.id,
-        options: taskOptions
-      };
-      return options;
-    });
-    this.options = options;
+    // const options = props.projectManager.projects.map(p => {
+    //   const taskOptions = p.tasks.map(t => {
+    //     return { value: t.id, label: t.label };
+    //   });
+    //   const options = {
+    //     label: p.id,
+    //     options: taskOptions
+    //   };
+    //   return options;
+    // });
+    // this.options = options;
   }
   render() {
     const { classes } = this.props;
-    const { works, startDay } = this.state;
+    const { works, startDay, endDay} = this.state;
     const { settings } = this.props.projectManager.weekWork;
 
     return (
@@ -82,7 +84,7 @@ class WeekWorkComponent extends React.Component<ProvidedProps & Props, State> {
             />
           </Grid>
           <Grid item xs={12} className={classes.timeline}>
-            <WorkTimeline works={works} onDelete={this.onRemoveWorkItem} />
+            <WorkTimeline works={works} startDay={startDay} endDay={endDay} onDelete={this.onRemoveWorkItem} />
           </Grid>
         </Grid>
       </div>

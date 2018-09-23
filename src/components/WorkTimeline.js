@@ -10,17 +10,28 @@ import Icon from '@material-ui/core/Icon';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
 
 const styles = (theme: Object) => ({
   root: {
     textAlign: 'left',
     marginTop: theme.spacing.unit * 3,
     padding: `0 ${theme.spacing.unit * 3}px`,
-    maxWidth: 700,
-    overflow: 'auto',
-    maxHeight: 700,
     position: 'relative',
     flexGrow: 1
+  },
+  scrollContainer: {
+    position: 'relative',
+    overflow: 'auto',
+    maxWidth: 700,
+    height: 400
+  },
+  scroll: {
+    position: 'relative',
+    width: '100%',
+    height: '100%'
   },
   timeline: {},
   actionButton: {
@@ -41,7 +52,9 @@ type ProvidedProps = {
 type Props = {
   classes: Object,
   works: Work[],
-  onDelete: (work: Work) => void
+  onDelete: (work: Work) => void,
+  startDay: Date,
+  endDay: Date
 }
 
 function ActionsIcons(props) {
@@ -100,8 +113,9 @@ const timelineInfo = (work: Work): string => {
 
 class WorkTimeline extends React.Component<ProvidedProps & Props> {
   render() {
-    const { classes, works, onDelete } = this.props;
+    const { classes, works, onDelete, startDay, endDay } = this.props;
 
+    const didWork = works.length > 0;
     const workItems = works.map(work => {
       return (
         <TimelineEvent
@@ -117,9 +131,19 @@ class WorkTimeline extends React.Component<ProvidedProps & Props> {
         </TimelineEvent>
       );
     });
+    const subheader = `${moment(startDay).format('dddd DD MMM')} - ${moment(endDay).format('dddd DD MMM')}`;
     return (
       <div className={classes.root}>
-        <Timeline className={classes.timeline}>{workItems}</Timeline>
+        <Card>
+          <CardHeader title="My Work" subheader={subheader} />
+          <CardContent className={classes.scrollContainer}>
+            {didWork ? (
+              <Timeline className={classes.scroll}>{workItems}</Timeline>
+            ) : (
+              <Typography variant="body1">You did&apos;nt work too much this week</Typography>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }

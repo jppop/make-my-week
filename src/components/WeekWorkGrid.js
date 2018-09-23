@@ -386,12 +386,6 @@ class WeekWorkGrid extends Component {
 
     let dayIndex = Math.trunc((clientY - boundingRect.y) / (this.props.cellHeight + 2));
 
-    // keep around start time
-    this.newWorkItem = {
-      startTime: start,
-      endTime: start + defaultWorkDuration,
-      dayIndex: dayIndex
-    };
     Log.trace(`grid position: (${start}, ${dayIndex})`, 'WeekWorkGrid::_onAddWorkItem');
     const gridCellId = gridCellKey(dayIndex, start - startTime + 1);
     Log.trace(`grid cell id: ${gridCellId}`, 'WeekWorkGrid::_onAddWorkItem');
@@ -428,7 +422,6 @@ class WeekWorkGrid extends Component {
     this.setState({ showTaskSearch: false });
   }
   _openTaskSelector = (anchorEl, callBack) => {
-    Log.trace(anchorEl, 'WeekWorkGrid::_openTaskSelector');
     this.setState({
       showTaskSearch: true,
       anchorEl: anchorEl,

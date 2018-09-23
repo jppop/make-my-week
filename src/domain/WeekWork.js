@@ -248,6 +248,13 @@ export class WeekWork {
     this.worker = 'me';
   }
 
+  get startDay(): Date { return new Date(this.day); }
+  get endDay(): Date {
+    const _endDay = new Date(this.day);
+    _endDay.setDate(_endDay.getDate() + this.settings.daysPerWeek - 1);
+    return _endDay;
+  }
+
   addWork(day: number, work: Work): Work {
     return WeekWork.addWeekWork(this, day, work);
   }

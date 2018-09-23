@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Task } from '../domain/WeekWork';
 import Log from '../Log';
 import { withStyles } from '@material-ui/core';
-import Popper from '@material-ui/core/Popover';
+import Popover from '@material-ui/core/Popover';
 import TextField from '@material-ui/core/TextField';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Paper from '@material-ui/core/Paper';
@@ -65,7 +65,7 @@ type ProvidedProps = {
 type Props = {
   classes: Object,
   tasks: () => Task[],
-  anchorEl: HTMLElement,
+  anchorEl: { x: number, y: number },
   x: number,
   y: number,
   showing: boolean,
@@ -165,18 +165,20 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
 
     return (
       <div className={classes.root} onClick={e => e.stopPropagation()}>
-        <Popper open anchorEl={anchorEl} placement="bottom-start" modifiers={{
-              flip: {
-                enabled: true
-              },
-              preventOverflow: {
-                enabled: true,
-                boundariesElement: 'scrollParent'
-              }
-            }}>
-          <Paper
-            className={classes.scrollContainer}
-          >
+        <Popover
+          open
+          anchorReference="anchorPosition"
+          anchorPosition={{ top: anchorEl.y, left: anchorEl.x }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+        >
+          <Paper className={classes.scrollContainer}>
             <ClickAwayListener onClickAway={this._close}>
               <div>
                 {searchInput}
@@ -187,7 +189,7 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
               </div>
             </ClickAwayListener>
           </Paper>
-        </Popper>
+        </Popover>
       </div>
     );
   }

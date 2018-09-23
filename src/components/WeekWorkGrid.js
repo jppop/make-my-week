@@ -203,7 +203,11 @@ class WeekWorkGrid extends Component {
         <div
           id={props.id}
           style={this.styles.gridCell(props.isFirstChild, props.isLastChild, props.lunchTime)}
-          ref={el => {if (el) {this._gridCells[el.id] = el;}}}
+          ref={el => {
+            if (el) {
+              this._gridCells[el.id] = el;
+            }
+          }}
         >
           {props.children}
         </div>
@@ -364,12 +368,6 @@ class WeekWorkGrid extends Component {
     );
   }
 
-  newWorkItem = {
-    startTime: NaN,
-    endTime: NaN,
-    dayIndex: NaN
-  }
-
   _onAddWorkItem = e => {
     if (e.currentTarget.id !== this.bounds.current.id) {
       return;
@@ -399,6 +397,7 @@ class WeekWorkGrid extends Component {
     Log.trace(`grid cell id: ${gridCellId}`, 'WeekWorkGrid::_onAddWorkItem');
     const gridCell = this._gridCells[gridCellId];
     Log.trace(gridCell, 'WeekWorkGrid::_onAddWorkItem');
+    const gridCellRect = gridCell.getBoundingClientRect();
     Log.trace(gridCell.getBoundingClientRect(), 'WeekWorkGrid::_onAddWorkItem');
 
     // open the task selector
@@ -407,7 +406,9 @@ class WeekWorkGrid extends Component {
       endTime: start + defaultWorkDuration,
       dayIndex: dayIndex
     };
-    this._openTaskSelector(gridCell, (task) => this._addWorkItem(task, newWorkInfo));
+    this._openTaskSelector({ x: gridCellRect.x, y: gridCellRect.y + gridCellRect.height }, task =>
+      this._addWorkItem(task, newWorkInfo)
+    );
   }
 
   _addWorkItem = (task, newWorkInfo) => {
@@ -427,6 +428,7 @@ class WeekWorkGrid extends Component {
     this.setState({ showTaskSearch: false });
   }
   _openTaskSelector = (anchorEl, callBack) => {
+    Log.trace(anchorEl, 'WeekWorkGrid::_openTaskSelector');
     this.setState({
       showTaskSearch: true,
       anchorEl: anchorEl,

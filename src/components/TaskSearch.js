@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Task } from '../domain/WeekWork';
 import Log from '../Log';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Popover from '@material-ui/core/Popover';
 import TextField from '@material-ui/core/TextField';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';

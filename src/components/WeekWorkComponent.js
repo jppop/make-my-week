@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import WorkTimeline from './WorkTimeline';
 import { ProjectManager, Work, Task } from '../domain/WeekWork';
 import WeekWorkGrid from './WeekWorkGrid';
 import Log from '../Log';
-import { Grid, withStyles } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
 
 const styles = (theme: Object) => ({
   root: {},
@@ -63,7 +64,7 @@ class WeekWorkComponent extends React.Component<ProvidedProps & Props, State> {
   }
   render() {
     const { classes } = this.props;
-    const { works, startDay, endDay} = this.state;
+    const { works, startDay, endDay } = this.state;
     const { settings } = this.props.projectManager.weekWork;
 
     return (

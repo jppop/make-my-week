@@ -6,7 +6,7 @@ import TaskSearch from './TaskSearch';
 import moment from 'moment';
 import { Work } from '../domain/WeekWork';
 import Log from '../Log';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@material-ui/core/styles/withStyles';
 import { toClass } from 'recompose';
 
 const QUATER_WIDTH = 16;

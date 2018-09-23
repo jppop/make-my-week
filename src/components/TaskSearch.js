@@ -7,6 +7,7 @@ import Popover from '@material-ui/core/Popover';
 import TextField from '@material-ui/core/TextField';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 const selectorHeight = 100;
 
@@ -72,8 +73,7 @@ type Props = {
 }
 
 type State = {
-  filter: string,
-  xHovered: boolean
+  filter: string
 }
 
 class TaskSearch extends React.Component<ProvidedProps & Props, State> {
@@ -82,15 +82,12 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
   constructor(props: ProvidedProps & Props) {
     super(props);
     this.state = {
-      filter: '',
-      xHovered: false,
-      selectedTask: null
+      filter: ''
     };
   }
 
   _close = () => {
     this.props.close();
-    this.setState({ xHovered: false, filter: '' });
   }
 
   _onKeyPress = (e: KeyboardEvent) => {
@@ -110,7 +107,6 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     Log.trace(this.textInput, 'TaskSearch::componentDidUpdate');
 
     if (this.textInput) {
-      Log.trace('give focus', 'TaskSearch::componentDidUpdate');
       this.textInput.focus();
     }
   }
@@ -135,16 +131,6 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
     shownTasks = this._getTasks(filter);
     const searchInput = (
       <div>
-        {/* <input
-          className={classes.input}
-          type="text"
-          placeholder="Search"
-          value={this.state.filter}
-          onChange={e => this.setState({ filter: e.target.value })}
-          ref={input => {
-            this.textInput = input;
-          }}
-        /> */}
         <TextField
           autoFocus
           label="Select task"
@@ -160,14 +146,9 @@ class TaskSearch extends React.Component<ProvidedProps & Props, State> {
       </div>
     );
     const closeButton = (
-      <span
-        className={classes.xStyle}
-        onClick={this._close}
-        onMouseEnter={() => this.setState({ xHovered: true })}
-        onMouseLeave={() => this.setState({ xHovered: false })}
-      >
+      <Typography className={classes.xStyle} variant="button" gutterBottom onClick={this._close}>
         x
-      </span>
+      </Typography>
     );
 
     const taskList = shownTasks.map(task => {

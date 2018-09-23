@@ -166,11 +166,20 @@ export class Work {
     }
     this._dayIndex = dayIndex;
   }
- 
+
+  isContinious(other: Work): boolean {
+    return (
+      (this._endTime.getTime() === other._startTime.getTime() ||
+        this._startTime.getTime() === other._endTime.getTime()) &&
+      this.id.project === other.id.project &&
+      this.id.task === other.id.task
+    );
+  }
+
   clone(): Work {
     const newWork: Work = Object.assign(Object.create(Object.getPrototypeOf((this: any))), this);
     return newWork;
-    // const newWork = new Work(this.id.project, this.id.task, this.id.work, this.start, 
+    // const newWork = new Work(this.id.project, this.id.task, this.id.work, this.start,
     //   this.end, this.label, this.color, this.workTime, this.dayIndex);
     // newWork._startTime = this._startTime;
     // newWork._endTime = this._endTime;
@@ -248,7 +257,9 @@ export class WeekWork {
     this.worker = 'me';
   }
 
-  get startDay(): Date { return new Date(this.day); }
+  get startDay(): Date {
+    return new Date(this.day);
+  }
   get endDay(): Date {
     const _endDay = new Date(this.day);
     _endDay.setDate(_endDay.getDate() + this.settings.daysPerWeek - 1);
@@ -256,28 +267,65 @@ export class WeekWork {
   }
 
   addWork(day: number, work: Work): Work {
-    return WeekWork.addWeekWork(this, day, work);
+    const backWorks = [...this.works];
+    try {
+      return this._addWeekWork(day, work);
+    } catch (e) {
+      this.works = backWorks;
+      throw e;
+    }
   }
 
-  static addWeekWork(weekWork: WeekWork, day: number, work: Work): Work {
-    WeekWork.attach(weekWork, day, work);
+  deleteWork(workId: string): Work {
+    const workIndex = this.works.findIndex(w => w.id.work === workId);
+    if (workIndex === -1) {
+      throw new Error('No work found');
+    }
+    // remove work
+    const deletedWork = this.works[workIndex];
+    const newWorks = [...this.works];
+    newWorks.splice(workIndex, 1);
+    this.works = newWorks;
+    return deletedWork;
+  }
+
+  getNextWork(work: Work): ?Work {
+    const works = this.works;
+    const workIndex = works.findIndex(w => w.id.work === work.id.work);
+    if (workIndex + 1 < works.length) {
+      const nextWork = works[workIndex + 1].clone();
+      return nextWork;
+    }
+  }
+
+  getPreviousWork(work: Work): ?Work {
+    const works = this.works;
+    const workIndex = works.findIndex(w => w.id.work === work.id.work);
+    if (workIndex > 0) {
+      const previousWork = works[workIndex - 1].clone();
+      return previousWork;
+    }
+  }
+
+  _addWeekWork(day: number, work: Work): Work {
+    this._attach(day, work);
 
     let dayIndex = work.dayIndex;
-    if (0 <= dayIndex && dayIndex < weekWork.settings.daysPerWeek) {
-      weekWork.works.push(work);
-      WeekWork.fixWork(weekWork.works, work);
+    if (0 <= dayIndex && dayIndex < this.settings.daysPerWeek) {
+      this.works.push(work);
+      this._fixWork(this.works, work);
     }
     return work;
   }
 
-  static attach(weekWork: WeekWork, dayIndex: number, work: Work) {
-    const { hasLunchTime, lunchTime, startTime, endTime } = weekWork.settings;
+  _attach(dayIndex: number, work: Work) {
+    const { hasLunchTime, lunchTime, startTime, endTime } = this.settings;
     work.hasLunchTime = hasLunchTime;
     work.lunchTime = lunchTime;
     work.workTime = [startTime, endTime];
     work.dayIndex = dayIndex;
-    const workDay = new Date(weekWork.day);
-    workDay.setDate(weekWork.day.getDate() + dayIndex);
+    const workDay = this.startDay;
+    workDay.setDate(this.day.getDate() + dayIndex);
     let hm = hoursAndMinutes(work.start);
     const workStartTime = new Date(workDay);
     workStartTime.setHours(hm.hours, hm.minutes, 0, 0);
@@ -289,7 +337,7 @@ export class WeekWork {
     return work;
   }
 
-  static fixWork(works: Work[], work: Work) {
+  _fixWork(works: Work[], work: Work) {
     // sort works
     WeekWork.sortWorks(works);
     // get position of work in the array
@@ -311,10 +359,14 @@ export class WeekWork {
         work.end = nextWork.start;
       }
     }
+    if (work.end > this.settings.endTime) {
+      work.end = this.settings.endTime;
+    }
     if (work.start >= work.end) {
       throw new Error('invalid work. start >= end');
     }
   }
+
   static sortWorks(works: Work[]): Work[] {
     works.sort((a, b) => {
       if (a._startTime === b._startTime) {
@@ -368,7 +420,7 @@ export class ProjectManager {
 
   getAllTasks = (): Task[] => {
     let tasks: Task[] = [];
-    this.projects.forEach(p => tasks = tasks.concat(p.tasks));
+    this.projects.forEach(p => (tasks = tasks.concat(p.tasks)));
     return tasks;
   }
 
@@ -397,23 +449,26 @@ export class ProjectManager {
     }
     const work = Work.fromTask(task, start, end);
     this.weekWork.addWork(dayIndex, work);
+
+    // merge neighbours
+    const previousWork = this.weekWork.getPreviousWork(work);
+    if (previousWork && previousWork.isContinious(work)) {
+      this.deleteWork(previousWork.id.work);
+      work.start = previousWork.start;
+    }
+    const nextWork = this.weekWork.getNextWork(work);
+    if (nextWork && work.isContinious(nextWork)) {
+      this.deleteWork(nextWork.id.work);
+      work.end = nextWork.end;
+    }
+
     task.addWork(work.duration(true));
     const newWork = work.clone();
     return newWork;
   }
 
   deleteWork = (workId: string): Work => {
-    const works = this.weekWork.works;
-    let workIndex = works.findIndex(w => w.id.work === workId);
-    if (workIndex === -1) {
-      throw new Error('No work found');
-    }
-    const deletedWork = works[workIndex];
-
-    // remove work
-    const newWorks = [...works];
-    newWorks.splice(workIndex, 1);
-    this.weekWork.works = newWorks;
+    const deletedWork = this.weekWork.deleteWork(workId);
 
     // update task counter
     const task = this.findTask(deletedWork.id.project, deletedWork.id.task);

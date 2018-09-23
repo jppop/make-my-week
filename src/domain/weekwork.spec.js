@@ -23,7 +23,7 @@ describe('work adjustments', () => {
     projectManager.addWork(projectId, tasks[0].id, 0, 8, 9);
     projectManager.addWork(projectId, tasks[1].id, 0, 9, 11.25);
     projectManager.addWork(projectId, tasks[2].id, 0, 14, 18);
-    let work = projectManager.addWork(projectId, tasks[2].id, 0, 11, 15);
+    let work = projectManager.addWork(projectId, tasks[3].id, 0, 11, 15);
     expect(work.start).toBe(11.25);
     expect(work.end).toBe(14);
   });
@@ -45,11 +45,16 @@ describe('work adjustments', () => {
     const tasks = projectManager.getTasks(projectId);
     let expectedDuration = tasks[0].completed;
     let work;
+    // add 1-hour work
     work = projectManager.addWork(projectId, tasks[0].id, 2, 8, 9);
-    expectedDuration += work.duration(true);
+    // continue work (+2.25), no pause
     work = projectManager.addWork(projectId, tasks[0].id, 2, 9, 11.25);
     expectedDuration += work.duration(true);
+    // continue again (+3), with a pause
     work = projectManager.addWork(projectId, tasks[0].id, 2, 15, 18);
+    expectedDuration += work.duration(true);
+    // nex day, continue (+4)
+    work = projectManager.addWork(projectId, tasks[0].id, 3, 8, 12);
     expectedDuration += work.duration(true);
 
     expect(expectedDuration).toBe(tasks[0].completed);
